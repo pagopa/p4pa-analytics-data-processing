@@ -23,6 +23,9 @@ configurations {
   compileOnly {
     extendsFrom(configurations.annotationProcessor.get())
   }
+  compileClasspath {
+    resolutionStrategy.activateDependencyLocking()
+  }
 }
 
 repositories {
@@ -33,19 +36,26 @@ val springDocOpenApiVersion = "2.8.13"
 val janinoVersion = "3.1.12"
 val openApiToolsVersion = "0.2.7"
 val micrometerVersion = "1.5.4"
+val bouncycastleVersion = "1.82"
 val httpClientVersion = "5.5"
+val commonsLang3Version = "3.19.0"
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter")
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-validation")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocOpenApiVersion")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocOpenApiVersion") {
+    exclude(group = "org.apache.commons", module = "commons-lang3")
+  }
+  implementation ("org.apache.commons:commons-lang3:${commonsLang3Version}")
   implementation("org.codehaus.janino:janino:$janinoVersion")
   implementation("io.micrometer:micrometer-tracing-bridge-otel:$micrometerVersion")
   implementation("io.micrometer:micrometer-registry-prometheus")
   implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
   implementation("org.openapitools:jackson-databind-nullable:$openApiToolsVersion")
+  implementation ("org.bouncycastle:bcprov-jdk18on:${bouncycastleVersion}")
   implementation("org.apache.httpcomponents.client5:httpclient5:$httpClientVersion")
 
   compileOnly("org.projectlombok:lombok")
@@ -90,12 +100,6 @@ tasks {
     filesMatching("**/application.yml") {
       expand(projectInfo)
     }
-  }
-}
-
-configurations {
-  compileClasspath {
-    resolutionStrategy.activateDependencyLocking()
   }
 }
 
