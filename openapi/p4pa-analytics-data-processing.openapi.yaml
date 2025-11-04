@@ -1,0 +1,47 @@
+openapi: 3.0.1
+info:
+  title: p4pa-analytics-data-processing
+  description: Api and Models
+  version: 0.0.1
+paths:
+  /api/v1/greet:
+    get:
+      summary: "Hello World"
+      description: "Sample endpoint that return greetings"
+      responses:
+        '200':
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Hello, World!"
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal Server Error"
+components:
+  schemas:
+    ErrorDTO:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            - NOT_FOUND
+            - BAD_REQUEST
+            - GENERIC_ERROR
+        message:
+          type: string
