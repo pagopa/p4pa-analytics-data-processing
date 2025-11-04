@@ -36,9 +36,16 @@ val springDocOpenApiVersion = "2.8.13"
 val janinoVersion = "3.1.12"
 val openApiToolsVersion = "0.2.7"
 val micrometerVersion = "1.5.4"
+val otelVersion = "1.49.0"
 val bouncycastleVersion = "1.82"
 val httpClientVersion = "5.5"
 val commonsLang3Version = "3.19.0"
+val temporalVersion = "1.31.0"
+val protobufJavaVersion = "4.32.1"
+val grpcBomVersion = "1.75.0"
+val guavaVersion = "33.5.0-jre"
+val mapStructVersion = "1.6.3"
+val podamVersion = "8.0.2.RELEASE"
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter")
@@ -46,6 +53,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
+  implementation("org.springframework.boot:spring-boot-starter-aop")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocOpenApiVersion") {
     exclude(group = "org.apache.commons", module = "commons-lang3")
   }
@@ -55,17 +63,33 @@ dependencies {
   implementation("io.micrometer:micrometer-registry-prometheus")
   implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
   implementation("org.openapitools:jackson-databind-nullable:$openApiToolsVersion")
+  implementation ("org.mapstruct:mapstruct:${mapStructVersion}")
   implementation ("org.bouncycastle:bcprov-jdk18on:${bouncycastleVersion}")
   implementation("org.apache.httpcomponents.client5:httpclient5:$httpClientVersion")
+  // Temporal
+  implementation("io.temporal:temporal-spring-boot-starter:$temporalVersion") {
+    exclude(group = "com.google.protobuf", module = "protobuf-java")
+    exclude(group = "com.google.protobuf", module = "protobuf-java-util")
+    exclude(group = "io.grpc", module = "grpc-bom")
+    exclude(group = "com.google.guava", module = "guava")
+  }
+  implementation("com.google.protobuf:protobuf-java:$protobufJavaVersion")
+  implementation("com.google.protobuf:protobuf-java-util:${protobufJavaVersion}")
+  implementation(platform("io.grpc:grpc-bom:${grpcBomVersion}"))
+  implementation("com.google.guava:guava:$guavaVersion")
+  implementation("io.opentelemetry:opentelemetry-opentracing-shim:${otelVersion}")
 
   compileOnly("org.projectlombok:lombok")
   annotationProcessor("org.projectlombok:lombok")
+  annotationProcessor("org.mapstruct:mapstruct-processor:$mapStructVersion")
   testAnnotationProcessor("org.projectlombok:lombok")
+  testAnnotationProcessor("org.mapstruct:mapstruct-processor:$mapStructVersion")
 
   //	Testing
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.mockito:mockito-core")
   testImplementation("org.projectlombok:lombok")
+  testImplementation ("uk.co.jemos.podam:podam:${podamVersion}")
 }
 
 tasks.withType<Test> {
@@ -133,6 +157,10 @@ openApiGenerate {
   outputDir.set("$projectDir/build/generated")
   apiPackage.set("it.gov.pagopa.analytics.process.controller.generated")
   modelPackage.set("it.gov.pagopa.analytics.process.dto.generated")
+  typeMappings.set(mapOf(
+    "ScheduleEnum" to "it.gov.pagopa.analytics.process.enums.ScheduleEnum",
+    "WorkflowExecutionStatus" to "io.temporal.api.enums.v1.WorkflowExecutionStatus"
+  ))
   configOptions.set(mapOf(
     "dateLibrary" to "java8",
     "requestMappingMode" to "api_interface",

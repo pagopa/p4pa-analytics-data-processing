@@ -87,9 +87,9 @@ See `workflow.*` properties on [application.yml](src/main/resources/application.
 | WF_DATA_PROCESSING_POLLER_SIZE | Poller size configured for Temporal task queue `DataProcessingWF` | 5       |
 
 #### 💼 Business logic
-| ENV                              | DESCRIPTION                                                           | DEFAULT    |
-|----------------------------------|-----------------------------------------------------------------------|------------|
-| SCHEDULE_ASSESSMENTS_CLASSIFY_WF | Frequency of AssessmentsClassify data processing WF (cron expression) | 0 1 * * *  |
+| ENV                                               | DESCRIPTION                                                                  | DEFAULT    |
+|---------------------------------------------------|------------------------------------------------------------------------------|------------|
+| SCHEDULE_ASSESSMENTS_CLASSIFICATIONS_PROCESS_CRON | Frequency of AssessmentsClassifications data processing WF (cron expression) | 0 1 * * *  |
 
 #### 🔑 keys
 | ENV                                  | DESCRIPTION                                                                              | DEFAULT |

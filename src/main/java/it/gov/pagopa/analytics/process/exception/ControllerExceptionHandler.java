@@ -1,7 +1,10 @@
 package it.gov.pagopa.analytics.process.exception;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
+import io.temporal.client.WorkflowExecutionAlreadyStarted;
 import it.gov.pagopa.analytics.process.dto.generated.ErrorDTO;
+import it.gov.pagopa.analytics.process.exception.custom.WorkflowInternalErrorException;
+import it.gov.pagopa.analytics.process.exception.custom.WorkflowNotFoundException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -29,6 +32,21 @@ import java.util.stream.Collectors;
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ControllerExceptionHandler {
+
+  @ExceptionHandler(WorkflowExecutionAlreadyStarted.class)
+  public ResponseEntity<ErrorDTO> handleWorkflowExecutionAlreadyStarted(WorkflowExecutionAlreadyStarted ex, HttpServletRequest request) {
+    return handleException(ex, request, HttpStatus.CONFLICT, ErrorDTO.CodeEnum.CONFLICT);
+  }
+
+  @ExceptionHandler({WorkflowNotFoundException.class})
+  public ResponseEntity<ErrorDTO> handleNotFoundException(RuntimeException ex, HttpServletRequest request) {
+    return handleException(ex, request, HttpStatus.NOT_FOUND, ErrorDTO.CodeEnum.NOT_FOUND);
+  }
+
+  @ExceptionHandler({WorkflowInternalErrorException.class})
+  public ResponseEntity<ErrorDTO> handleInternalError(RuntimeException ex, HttpServletRequest request) {
+    return handleException(ex, request, HttpStatus.INTERNAL_SERVER_ERROR, ErrorDTO.CodeEnum.GENERIC_ERROR);
+  }
 
   @ExceptionHandler({ValidationException.class, HttpMessageNotReadableException.class, MethodArgumentNotValidException.class, MethodArgumentTypeMismatchException.class})
   public ResponseEntity<ErrorDTO> handleViolationException(Exception ex, HttpServletRequest request) {

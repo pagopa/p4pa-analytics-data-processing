@@ -9,6 +9,19 @@ spring:
   threads:
     virtual:
       enabled: true
+  temporal:
+    namespace: "\${TEMPORAL_SERVER_NAMESPACE:pu-analytics}"
+    connection:
+      enable-https: "\${TEMPORAL_SERVER_ENABLE_HTTPS:false}"
+      target: "\${TEMPORAL_SERVER_HOST:localhost}:\${TEMPORAL_SERVER_PORT:7233}"
+    workers-auto-discovery:
+      packages:
+        - it.gov.pagopa.analytics.process.wf
+    workers:
+      # generic
+      - task-queue: DataProcessingWF
+        capacity:
+          max-concurrent-workflow-task-pollers: "\${WF_DATA_PROCESSING_POLLER_SIZE:3}"
 management:
   info:
     build.enabled: true
@@ -85,3 +98,21 @@ rest:
     timeout:
       connect-millis: "\${DEFAULT_REST_TIMEOUT_CONNECT_MILLIS:120000}"
       read-millis: "\${DEFAULT_REST_TIMEOUT_READ_MILLIS:120000}"
+
+schedule:
+  assessments-classifications-process:
+    cron-expression: "\${SCHEDULE_ASSESSMENTS_CLASSIFICATIONS_PROCESS_CRON:0 1/6 * * *}" # each day, 01:00-07:00-13:00-19:00 (Europe/Rome)
+
+workflow:
+  default:
+    startToCloseTimeoutInSeconds: "\${DEFAULT_ACTIVITY_CONFIG_START_TO_CLOSE_TIMEOUT_IN_SECONDS:300}"
+    retryInitialIntervalInMillis: "\${DEFAULT_ACTIVITY_CONFIG_RETRY_INITIAL_INTERVAL_IN_MILLIS:1000}"
+    retryBackoffCoefficient: "\${DEFAULT_ACTIVITY_CONFIG_RETRY_BACKOFF_COEFFICIENT:1.5}"
+    retryMaximumAttempts: "\${DEFAULT_ACTIVITY_CONFIG_RETRY_MAXIMUM_ATTEMPTS:30}"
+
+  # data processing
+  assessments-classification-process:
+    start-to-close-timeout-in-seconds: "\${ASSESSMENTS_CLASSIFICATIONS_ACTIVITY_CONFIG_START_TO_CLOSE_TIMEOUT_IN_SECONDS:\${workflow.default.startToCloseTimeoutInSeconds}}"
+    retry-initial-interval-in-millis: "\${ASSESSMENTS_CLASSIFICATIONS_ACTIVITY_CONFIG_RETRY_INITIAL_INTERVAL_IN_MILLIS:\${workflow.default.retryInitialIntervalInMillis}}"
+    retry-backoff-coefficient: "\${ASSESSMENTS_CLASSIFICATIONS_ACTIVITY_CONFIG_RETRY_BACKOFF_COEFFICIENT:\${workflow.default.retryBackoffCoefficient}}"
+    retry-maximum-attempts: "\${ASSESSMENTS_CLASSIFICATIONS_ACTIVITY_CONFIG_RETRY_MAXIMUM_ATTEMPTS:\${workflow.default.retryMaximumAttempts}}"
