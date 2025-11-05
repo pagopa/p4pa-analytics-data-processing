@@ -34,9 +34,9 @@ public class AssessmentsClassificationsProcessWFImpl implements AssessmentsClass
 
   @Override
   public String synchronize() {
-    log.info("Executing AssessmentsClassifications DataMart process");
+    log.info("Executing AssessmentsClassifications DataMart process WF");
     String result = sampleActivity.executeSampleActivity();
-    log.info("AssessmentsClassifications process completed: {}", result);
+    log.info("AssessmentsClassifications process WF completed: {}", result);
     return result;
   }
 }
