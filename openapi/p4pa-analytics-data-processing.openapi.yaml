@@ -62,6 +62,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDTO'
+  /workflow/assessments-classifications-process:
+    post:
+      tags:
+        - AssessmentsClassificationsProcess
+      operationId: processAssessmentsClassifications
+      description: To start AssessmentsClassifications process
+      responses:
+        '201':
+          description: "Workflow created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowCreatedDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
 security:
   - BearerAuth: [ ]
 components:
