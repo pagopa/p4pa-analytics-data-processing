@@ -151,8 +151,15 @@ RUN apk upgrade --no-cache && \
     source .venv/bin/activate && \
     python -m ensurepip --upgrade && \
     python -m pip install dbt-core dbt-postgres && \
-    dbt --version
+    dbt --version && \
+    echo source .venv/bin/activate >> /home/${APP_USER}/.rc && \
+    chmod +x /home/${APP_USER}/.rc && \
+    echo source /home/${APP_USER}/.rc >> DEV && \
+    chmod +x DEV && \
+    cp DEV UAT && \
+    cp DEV PROD
 
+ENV ENV=DEV
 
 FROM runtime
 ARG APP_USER

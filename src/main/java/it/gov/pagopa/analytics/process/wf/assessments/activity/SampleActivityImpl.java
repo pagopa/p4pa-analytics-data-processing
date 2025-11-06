@@ -20,6 +20,6 @@ public class SampleActivityImpl implements SampleActivity {
   @Override
   public String executeSampleActivity() {
     log.info("Executing SAMPLE activity");
-    return "Command executed with exitStatus:" + commandExecutor.executeSampleActivity(new String[]{"echo", "Hello World!"});
+    return "Command executed with exitStatus:" + commandExecutor.executeSampleActivity(new String[]{"dbt", "--version"});
   }
 }
