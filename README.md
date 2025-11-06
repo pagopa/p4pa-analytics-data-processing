@@ -13,8 +13,9 @@ See [OpenAPI](openapi/generated.openapi.json), exposed through the following pat
 * `/swagger-ui/index.html`
 
 ### 📌 Relevant APIs
-* `GET /workflowhub/workflows/{workflowId}/status`: To get workflow status;
-* `GET /workflowhub/schedules/{scheduleId}/info`: To get schedule info;
+* `GET /workflows/{workflowId}/status`: To get workflow status;
+* `GET /schedules/{scheduleId}/info`: To get schedule info;
+* `POST /workflow/assessments-classifications-process`: To start AssessmentsClassificationsProcess WF.
 
 ### 📌 Common HTTP status returned:
 * `401`: Invalid access token provided, thus a new login is required;
@@ -92,9 +93,9 @@ See `workflow.*` properties on [application.yml](src/main/resources/application.
 | SCHEDULE_ASSESSMENTS_CLASSIFICATIONS_PROCESS_CRON | Frequency of AssessmentsClassifications data processing WF (cron expression) | 0 1 * * *  |
 
 #### 🔑 keys
-| ENV                                  | DESCRIPTION                                                                              | DEFAULT |
-|--------------------------------------|------------------------------------------------------------------------------------------|---------|
-| JWT_TOKEN_PUBLIC_KEY                 | p4pa-auth JWT public key                                                                 |         |
+| ENV                  | DESCRIPTION                                                                              | DEFAULT |
+|----------------------|------------------------------------------------------------------------------------------|---------|
+| JWT_TOKEN_PUBLIC_KEY | p4pa-auth JWT public key                                                                 |         |
 
 ## 🛠️ Getting Started
 

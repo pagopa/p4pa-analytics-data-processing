@@ -54,7 +54,7 @@ class AssessmentsClassificationsProcessWFClientTest {
 
     // Then
     Assertions.assertEquals(expectedResult, result);
-    Mockito.verify(wfMock).synchronize();
+    Mockito.verify(wfMock).processAssessmentsClassifications();
 
     TemporalTestUtils.verifyWorkflowTaskQueueConfiguration(taskQueue, AssessmentsClassificationsProcessWFImpl.class);
   }

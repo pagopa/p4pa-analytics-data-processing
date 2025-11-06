@@ -41,13 +41,13 @@ class AssessmentsClassificationsProcessWFTest {
       sampleActivityMock);
   }
   @Test
-  void givenSuccessfulSyncWhenSynchronizeThenLogSynchronizedTaxonomies() {
+  void givenSuccessfulSyncWhenProcessAssessmentsClassificationsThenLogSynchronizedTaxonomies() {
     // Given
     String expectedResult = "OK";
     when(sampleActivityMock.executeSampleActivity()).thenReturn(expectedResult);
 
     // When
-    String result = wf.synchronize();
+    String result = wf.processAssessmentsClassifications();
 
     // Then
     Assertions.assertSame(expectedResult, result);

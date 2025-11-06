@@ -11,6 +11,6 @@ import io.temporal.workflow.WorkflowMethod;
 @WorkflowInterface
 public interface AssessmentsClassificationsProcessWF {
   @WorkflowMethod
-  String synchronize();
+  String processAssessmentsClassifications();
 }
 

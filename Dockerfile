@@ -35,11 +35,14 @@ ARG APP_GROUP
 
 # Install base packages
 RUN apk add --no-cache \
-    wget \
-    unzip \
     bash \
+    git \
+    python3 \
     shadow \
-    git
+    unzip \
+    wget && \
+    python -m ensurepip --upgrade && \
+    python -m pip install dbt-core dbt-postgres
 
 # Create Gradle user
 RUN groupadd --system --gid 1000 ${APP_GROUP} && \

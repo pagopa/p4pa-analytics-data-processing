@@ -33,6 +33,6 @@ public class AssessmentsClassificationsProcessWFClient {
       taskQueue,
       workflowId);
 
-    return workflowClientService.start(workflow::synchronize);
+    return workflowClientService.start(workflow::processAssessmentsClassifications);
   }
 }
