@@ -41,6 +41,8 @@ RUN apk add --no-cache \
     shadow \
     unzip \
     wget && \
+    python3 -m venv .venv && \
+    source .venv/bin/activate && \
     python -m ensurepip --upgrade && \
     python -m pip install dbt-core dbt-postgres
 
