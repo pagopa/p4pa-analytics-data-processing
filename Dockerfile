@@ -37,17 +37,9 @@ ARG APP_GROUP
 RUN apk add --no-cache \
     bash \
     git \
-    python3 \
     shadow \
     unzip \
-    wget \
-
-# Install dbt-core
-RUN python3 -m venv .venv && \
-    source .venv/bin/activate && \
-    python -m ensurepip --upgrade && \
-    python -m pip install dbt-core dbt-postgres && \
-    dbt --version
+    wget
 
 # Create Gradle user
 RUN groupadd --system --gid 1000 ${APP_GROUP} && \
@@ -82,10 +74,10 @@ RUN echo "Downloading Gradle ${GRADLE_VERSION}..." && \
     mv "gradle-${GRADLE_VERSION}" "${GRADLE_HOME}" && \
     ln -s "${GRADLE_HOME}/bin/gradle" /usr/bin/gradle && \
     rm gradle.zip && \
-    # Setup Gradle user directories
+    # Setup Gradle user directories \
     mkdir -p /home/${APP_USER}/.gradle && \
     chown --recursive ${APP_USER}:${APP_GROUP} /home/${APP_USER} && \
-    # Verify installation
+    # Verify installation \
     echo "Verifying Gradle installation..." && \
     gradle --version
 
@@ -96,6 +88,8 @@ VOLUME /home/${APP_USER}/.gradle
 # 📚 Dependencies Stage
 #
 FROM gradle-setup AS dependencies
+ARG APP_USER
+ARG APP_GROUP
 
 WORKDIR /build
 
@@ -118,6 +112,8 @@ RUN gradle dependenciesBuild dependencies --no-daemon
 # 🏗️ Build Stage
 #
 FROM dependencies AS build
+ARG APP_USER
+ARG APP_GROUP
 
 # Copy source code
 COPY --chown=${APP_USER}:${APP_GROUP} src src/
@@ -132,7 +128,6 @@ FROM ${IMAGE}:${IMAGE_VERSION}@sha256:${IMAGE_SHA} AS runtime
 ARG APP_USER
 ARG APP_GROUP
 ARG APP_HOME
-ARG APPINSIGHTS_VERSION
 ARG TZ
 
 WORKDIR ${APP_HOME}
@@ -143,13 +138,27 @@ ENV TZ=${TZ}
 # 🛡️ Security Setup and Timezone
 RUN apk upgrade --no-cache && \
     apk add --no-cache \
-        tini \
         curl \
-        # Configure timezone + ENV=TZ
+        python3 \
+        tini \
+        # Configure timezone + ENV=TZ \
         tzdata && \
-    # Create user and group
+    # Create user and group \
     addgroup -S ${APP_GROUP} && \
-    adduser -S ${APP_USER} -G ${APP_GROUP}
+    adduser -S ${APP_USER} -G ${APP_GROUP} && \
+    # Install dbt-core \
+    python3 -m venv .venv && \
+    source .venv/bin/activate && \
+    python -m ensurepip --upgrade && \
+    python -m pip install dbt-core dbt-postgres && \
+    dbt --version
+
+
+FROM runtime
+ARG APP_USER
+ARG APP_GROUP
+ARG APP_HOME
+ARG APPINSIGHTS_VERSION
 
 # 📦 Copy Artifacts
 COPY --from=build /build/build/libs/*.jar ${APP_HOME}/app.jar
