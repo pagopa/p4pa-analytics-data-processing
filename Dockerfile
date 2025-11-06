@@ -40,11 +40,14 @@ RUN apk add --no-cache \
     python3 \
     shadow \
     unzip \
-    wget && \
-    python3 -m venv .venv && \
+    wget \
+
+# Install dbt-core
+RUN python3 -m venv .venv && \
     source .venv/bin/activate && \
     python -m ensurepip --upgrade && \
-    python -m pip install dbt-core dbt-postgres
+    python -m pip install dbt-core dbt-postgres && \
+    dbt --version
 
 # Create Gradle user
 RUN groupadd --system --gid 1000 ${APP_GROUP} && \
