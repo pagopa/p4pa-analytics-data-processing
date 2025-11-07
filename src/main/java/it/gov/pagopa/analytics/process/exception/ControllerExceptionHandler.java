@@ -5,6 +5,7 @@ import io.temporal.client.WorkflowExecutionAlreadyStarted;
 import it.gov.pagopa.analytics.process.dto.generated.ErrorDTO;
 import it.gov.pagopa.analytics.process.exception.custom.WorkflowInternalErrorException;
 import it.gov.pagopa.analytics.process.exception.custom.WorkflowNotFoundException;
+import it.gov.pagopa.analytics.process.utils.Utilities;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -81,7 +82,7 @@ public class ControllerExceptionHandler {
     return ResponseEntity
       .status(httpStatus)
       .contentType(MediaType.APPLICATION_JSON)
-      .body(new ErrorDTO(errorEnum, message));
+      .body(new ErrorDTO(errorEnum, message, Utilities.getTraceId()));
   }
 
   private static void logException(Exception ex, HttpServletRequest request, HttpStatusCode httpStatus) {
