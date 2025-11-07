@@ -152,14 +152,8 @@ RUN apk upgrade --no-cache && \
     python -m ensurepip --upgrade && \
     python -m pip install dbt-core dbt-postgres && \
     dbt --version && \
-    echo source .venv/bin/activate >> /home/${APP_USER}/.rc && \
-    chmod +x /home/${APP_USER}/.rc && \
-    echo source /home/${APP_USER}/.rc >> DEV && \
-    chmod +x DEV && \
-    cp DEV UAT && \
-    cp DEV PROD
-
-ENV ENV=DEV
+    echo source .venv/bin/activate >> /etc/profile && \
+    chmod +x /etc/profile
 
 FROM runtime
 ARG APP_USER
@@ -180,4 +174,4 @@ USER ${APP_USER}
 
 # 🎬 Startup Configuration
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["java", "-jar", "/app/app.jar"]
+CMD ["/bin/sh", "-l", "-c", "java -jar /app/app.jar"]
