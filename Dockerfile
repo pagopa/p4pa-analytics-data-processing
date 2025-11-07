@@ -153,6 +153,7 @@ RUN apk upgrade --no-cache && \
     python -m pip install dbt-core dbt-postgres && \
     dbt --version && \
     echo source .venv/bin/activate >> /etc/profile && \
+    echo PATH="$PATH" >> /etc/profile && \
     chmod +x /etc/profile
 
 FROM runtime
