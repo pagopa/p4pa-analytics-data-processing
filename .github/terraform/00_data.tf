@@ -24,7 +24,7 @@ data "azurerm_key_vault_secret" "sonar_token" {
   name         = "sonar-cloud-token"
 }
 
-# Key Vault - Slack webhok
+# Key Vault - Slack Webhook
 data "azurerm_key_vault_secret" "slack_webhook" {
   count = var.env_short == "p" ? 1 : 0
 
