@@ -4,9 +4,8 @@
     incremental_strategy = "merge",
 ) }}
 
-
 select
-    md5(debt_position_type_org_id::varchar) as debt_position_type_org_pk,
+    debt_position_type_org_pk,
     debt_position_type_org_id,
     debt_position_type_id,
     organization_id,

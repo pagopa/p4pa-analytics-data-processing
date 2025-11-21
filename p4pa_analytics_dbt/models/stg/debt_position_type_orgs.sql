@@ -3,12 +3,12 @@
     unique_key = "debt_position_type_org_pk",
     incremental_strategy = "merge",
     ) 
-    }}
+}}
 
 -- select the row group that has not been processed yet
 with source as (
     select
-        md5(dpto.debt_position_type_org_id::varchar) as debt_position_type_org_pk,
+        {{ dbt_utils.generate_surrogate_key(['debt_position_type_org_id']) }} as debt_position_type_org_pk,
         dpto.debt_position_type_org_id,
         dpto.debt_position_type_id,
         dpto.organization_id,
@@ -44,9 +44,7 @@ with source as (
         -- technical fields
         dpto.processed_time as src_processed_time,
         current_timestamp as target_processed_time
-
     from raw.debt_position_type_orgs dpto
-    LEFT JOIN stg.debt_position_type_orgs t ON dpto.debt_position_type_org_id = t.debt_position_type_org_id
     
     {% if is_incremental() %}
         where dpto.processed_time >= (select coalesce(max(processed_time), '1900-01-01') from {{ this }} )
@@ -98,5 +96,4 @@ select
     -- technical fields
     target_processed_time as processed_time
 from ranked r
-
 where rn = 1
