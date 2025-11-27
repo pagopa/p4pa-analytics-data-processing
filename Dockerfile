@@ -135,9 +135,6 @@ WORKDIR ${APP_HOME}
 # Set timezone environment variable
 ENV TZ=${TZ}
 
-COPY packages.yml ${APP_HOME}
-COPY dbt_project.yml ${APP_HOME}
-
 # 🛡️ Security Setup and Timezone
 RUN apk upgrade --no-cache && \
     apk add --no-cache \
@@ -155,10 +152,12 @@ RUN apk upgrade --no-cache && \
     python -m ensurepip --upgrade && \
     python -m pip install dbt-core dbt-postgres && \
     dbt --version && \
-    dbt deps &&  \
     echo source .venv/bin/activate >> /etc/profile && \
     echo PATH="$PATH" >> /etc/profile && \
     chmod +x /etc/profile
+
+RUN source /.venv/bin/activate && \
+    dbt deps
 
 FROM runtime
 ARG APP_USER
