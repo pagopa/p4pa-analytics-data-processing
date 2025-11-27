@@ -156,8 +156,11 @@ RUN apk upgrade --no-cache && \
     echo PATH="$PATH" >> /etc/profile && \
     chmod +x /etc/profile
 
-RUN source /.venv/bin/activate && \
-    dbt deps
+RUN mkdir dbt
+COPY ./dbt ./dbt
+
+# Install dbt packages
+RUN dbt deps --project-dir ./dbt
 
 FROM runtime
 ARG APP_USER
