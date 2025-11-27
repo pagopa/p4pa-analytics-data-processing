@@ -157,7 +157,7 @@ RUN apk upgrade --no-cache && \
     chmod +x /etc/profile
 
 RUN mkdir dbt
-COPY ./dbt ./dbt
+COPY /usr/src/dbt/dbt_project ./dbt
 
 # Install dbt packages
 RUN dbt deps --project-dir ./dbt
