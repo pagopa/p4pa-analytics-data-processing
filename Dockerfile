@@ -156,11 +156,14 @@ RUN apk upgrade --no-cache && \
     echo PATH="$PATH" >> /etc/profile && \
     chmod +x /etc/profile
 
-RUN mkdir dbt
-COPY /usr/src/dbt/dbt_project ./dbt
+COPY packages.yml ${APP_HOME}/
+COPY dbt_project.yml ${APP_HOME}/
+COPY models ${APP_HOME}/models
+COPY analysis ${APP_HOME}/analysis
+COPY seeds ${APP_HOME}/seeds
 
 # Install dbt packages
-RUN dbt deps --project-dir ./dbt
+RUN dbt deps
 
 FROM runtime
 ARG APP_USER
