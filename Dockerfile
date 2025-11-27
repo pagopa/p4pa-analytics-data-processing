@@ -135,6 +135,9 @@ WORKDIR ${APP_HOME}
 # Set timezone environment variable
 ENV TZ=${TZ}
 
+COPY packages.yml ${APP_HOME}
+COPY dbt_project.yml ${APP_HOME}
+
 # 🛡️ Security Setup and Timezone
 RUN apk upgrade --no-cache && \
     apk add --no-cache \
