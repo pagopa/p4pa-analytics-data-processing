@@ -1,6 +1,6 @@
 package it.gov.pagopa.analytics.process.wf.assessments.wf;
 
-import it.gov.pagopa.analytics.process.wf.assessments.activity.SampleActivity;
+import it.gov.pagopa.analytics.process.wf.assessments.activity.AssessmentsClassificationProcessingActivity;
 import it.gov.pagopa.analytics.process.wf.assessments.config.AssessmentsClassificationsProcessWfConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 class AssessmentsClassificationsProcessWFTest {
 
   @Mock
-  private SampleActivity sampleActivityMock;
+  private AssessmentsClassificationProcessingActivity assessmentsClassificationProcessingActivityMock;
 
   private AssessmentsClassificationsProcessWFImpl wf;
 
@@ -27,7 +27,7 @@ class AssessmentsClassificationsProcessWFTest {
   void setUp() {
     AssessmentsClassificationsProcessWfConfig assessmentsClassificationsProcessWfConfigMock = mock(AssessmentsClassificationsProcessWfConfig.class);
     ApplicationContext applicationContextMock = mock(ApplicationContext.class);
-    when(assessmentsClassificationsProcessWfConfigMock.buildSampleActivityStub()).thenReturn(sampleActivityMock);
+    when(assessmentsClassificationsProcessWfConfigMock.buildSampleActivityStub()).thenReturn(assessmentsClassificationProcessingActivityMock);
 
     when(applicationContextMock.getBean(AssessmentsClassificationsProcessWfConfig.class)).thenReturn(assessmentsClassificationsProcessWfConfigMock);
 
@@ -38,13 +38,13 @@ class AssessmentsClassificationsProcessWFTest {
   @AfterEach
   void verifyNoMoreInteractions() {
     Mockito.verifyNoMoreInteractions(
-      sampleActivityMock);
+      assessmentsClassificationProcessingActivityMock);
   }
   @Test
   void givenSuccessfulSyncWhenProcessAssessmentsClassificationsThenLogSynchronizedTaxonomies() {
     // Given
     String expectedResult = "OK";
-    when(sampleActivityMock.executeSampleActivity()).thenReturn(expectedResult);
+    when(assessmentsClassificationProcessingActivityMock.executeAssessmentsClassificationProcessingActivity()).thenReturn(expectedResult);
 
     // When
     String result = wf.processAssessmentsClassifications();

@@ -9,7 +9,7 @@ class CommandExecutorTest {
 
   @Test
   void test(){
-    Integer exitStatus = commandExecutor.executeSampleActivity(new String[]{"pwd"});
+    Integer exitStatus = commandExecutor.executeCommandActivity(new String[]{"pwd"});
 
     Assertions.assertEquals(0, exitStatus);
   }
