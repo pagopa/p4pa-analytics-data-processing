@@ -160,7 +160,8 @@ RUN apk upgrade --no-cache && \
 COPY --chown=${APP_USER}:${APP_GROUP} p4pa_analytics_dbt dbt/
 
 # Install dbt packages
-RUN dbt deps --project-dir dbt
+RUN source /.venv/bin/activate && \
+    dbt deps --project-dir dbt
 
 FROM runtime
 ARG APP_USER
