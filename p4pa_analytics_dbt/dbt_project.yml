@@ -24,26 +24,22 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 models:
   p4pa_analytics_dbt:
-    raw:
-      +tags: 'raw'
-      +materialized: table
-      +schema: raw
     stg:
       +tags: 'stg'
       +materialized: table
       +schema: stg
-    mid:
-      +tags: 'mid'
-      +materialized: table
-      +schema: mid
+#    mid:
+ #     +tags: 'mid'
+  #    +materialized: table
+   #   +schema: mid
     dwh:
       +tags: 'dwh'
       +materialized: table
       +schema: dwh
-    dmt:
-      +tags: 'dmt'
-      +materialized: view
-      +schema: dmt
+#    dmt:
+ #     +tags: 'dmt'
+   #   +materialized: view
+    #  +schema: dmt
     aux_:
       +tags: 'aux'
       +materialized: table

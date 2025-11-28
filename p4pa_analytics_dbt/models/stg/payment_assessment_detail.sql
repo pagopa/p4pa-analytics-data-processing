@@ -4,14 +4,11 @@
     incremental_strategy = "merge",
         pre_hook="
         DELETE FROM {{ this }} as t
-        USING (
-            SELECT DISTINCT
-                organization_id,
-                iud
-            FROM stg.payment_assessment_detail_tmp
-        ) s
-        WHERE t.organization_id = s.organization_id
-          AND t.iud = s.iud
+        WHERE (t.organization_id, t.iud) IN (
+            SELECT organization_id, iud
+            FROM {{ ref('payment_assessment_detail_tmp') }} as tmp
+            WHERE tmp.processed_time >= (select coalesce(max(processed_time), '1900-01-01') from {{ this }} )
+    )
     "
     )  
     }}
@@ -51,7 +48,7 @@ with source as (
     processed_time as src_processed_time,
     current_timestamp as target_processed_time
 
-    from stg.payment_assessment_detail_tmp tmp
+    from {{ ref('payment_assessment_detail_tmp') }} tmp
 
     {% if is_incremental() %}
     where tmp.processed_time >= (select coalesce(max(processed_time), '1900-01-01') from {{ this }} )
@@ -62,7 +59,7 @@ with source as (
 ranked as (
     select
         s.*,
-        row_number() over (partition by (s.organization_id, s.iur) order by s.src_processed_time desc) as rn
+        row_number() over (partition by (s.assessment_detail_pk) order by s.src_processed_time desc) as rn
     from source s
 )
 
