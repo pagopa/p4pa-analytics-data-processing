@@ -13,12 +13,12 @@ import java.util.function.BiConsumer;
 public class CommandExecutorImpl implements CommandExecutor {
 
   @Override
-  public Integer executeSampleActivity(String[] cmd) {
-    return executeSampleActivity(cmd, this::logProcessOutputs);
+  public Integer executeCommandActivity(String[] cmd) {
+    return executeCommandActivity(cmd, this::logProcessOutputs);
   }
 
   @Override
-  public Integer executeSampleActivity(String[] cmd, BiConsumer<BufferedReader, BufferedReader> processLogAndErrorConsumer) {
+  public Integer executeCommandActivity(String[] cmd, BiConsumer<BufferedReader, BufferedReader> processLogAndErrorConsumer) {
     try {
       Process p = Runtime.getRuntime().exec(cmd);
       log.info("Executed command '{}' with pid {}", String.join(" ", cmd), p.pid());

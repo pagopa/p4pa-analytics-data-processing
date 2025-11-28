@@ -156,6 +156,13 @@ RUN apk upgrade --no-cache && \
     echo PATH="$PATH" >> /etc/profile && \
     chmod +x /etc/profile
 
+# Copy dbt project
+COPY --chown=${APP_USER}:${APP_GROUP} p4pa_analytics_dbt dbt/
+
+# Install dbt packages
+RUN source .venv/bin/activate && \
+    dbt deps --project-dir dbt
+
 FROM runtime
 ARG APP_USER
 ARG APP_GROUP

@@ -5,8 +5,8 @@ import java.util.function.BiConsumer;
 
 /** Utility to run command on local command line */
 public interface CommandExecutor {
-  /** It will run {@link #executeSampleActivity(String[], BiConsumer)} logging outputs on console */
-  Integer executeSampleActivity(String[] cmd);
+  /** It will run {@link #executeCommandActivity(String[], BiConsumer)} logging outputs on console */
+  Integer executeCommandActivity(String[] cmd);
 
   /**
    * It will run a command awaiting its completion.
@@ -14,5 +14,5 @@ public interface CommandExecutor {
    * @param processLogAndErrorConsumer to obtain access on logs during execution
    * @return exitCode
    */
-  Integer executeSampleActivity(String[] cmd, BiConsumer<BufferedReader, BufferedReader> processLogAndErrorConsumer);
+  Integer executeCommandActivity(String[] cmd, BiConsumer<BufferedReader, BufferedReader> processLogAndErrorConsumer);
 }
