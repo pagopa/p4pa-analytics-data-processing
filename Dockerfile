@@ -156,11 +156,11 @@ RUN apk upgrade --no-cache && \
     echo PATH="$PATH" >> /etc/profile && \
     chmod +x /etc/profile
 
-COPY packages.yml ${APP_HOME}/
-COPY dbt_project.yml ${APP_HOME}/
+# Copy dbt project
+COPY --chown=${APP_USER}:${APP_GROUP} p4pa_analytics_dbt dbt/
 
 # Install dbt packages
-RUN dbt deps
+RUN dbt deps --project-dir dbt
 
 FROM runtime
 ARG APP_USER
