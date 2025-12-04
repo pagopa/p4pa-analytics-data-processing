@@ -14,6 +14,10 @@
     )  
     }}
 
+-- depends_on = {{ ref('dim_debt_position_type_org') }}
+-- depends_on = {{ ref('dim_office') }}
+-- depends_on = {{ ref('dim_section') }}
+-- depends_on = {{ ref('dim_assessment') }}
 
 with base as (
     select *, CAST(TO_CHAR(date_receipt, 'YYYY') AS INT) AS operating_year,
