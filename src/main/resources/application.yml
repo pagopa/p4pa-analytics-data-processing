@@ -101,7 +101,7 @@ rest:
 
 schedule:
   assessments-classifications-process:
-    cron-expression: "\${SCHEDULE_ASSESSMENTS_CLASSIFICATIONS_PROCESS_CRON:0 1/6 * * *}" # each day, 01:00-07:00-13:00-19:00 (Europe/Rome)
+    cron-expression: "\${SCHEDULE_ASSESSMENTS_CLASSIFICATIONS_PROCESS_CRON:*/30 * * * *}" # each day, 01:00-07:00-13:00-19:00 (Europe/Rome)
 
 workflow:
   default:
