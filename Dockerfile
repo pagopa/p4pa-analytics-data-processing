@@ -159,6 +159,7 @@ RUN apk upgrade --no-cache && \
 # Copy dbt project
 COPY --chown=${APP_USER}:${APP_GROUP} p4pa_analytics_dbt dbt/
 # Set permission dbt project for testing manually
+RUN mkdir -p /app/dbt/logs
 RUN chmod -R 777 dbt
 
 # Install dbt packages
