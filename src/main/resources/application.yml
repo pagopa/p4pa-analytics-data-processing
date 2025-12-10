@@ -21,7 +21,18 @@ spring:
       # generic
       - task-queue: DataProcessingWF
         capacity:
-          max-concurrent-workflow-task-pollers: "\${WF_DATA_PROCESSING_POLLER_SIZE:3}"
+          workflow-task-pollers-configuration:
+            poller-behavior-autoscaling:
+              enabled: true
+              initial-concurrent-task-pollers: "\${WF_DATA_PROCESSING_MIN_POLLER_SIZE:1}"
+              min-concurrent-task-pollers: "\${WF_DATA_PROCESSING_MIN_POLLER_SIZE:1}"
+              max-concurrent-task-pollers: "\${WF_DATA_PROCESSING_MAX_POLLER_SIZE:3}"
+          activity-task-pollers-configuration:
+            poller-behavior-autoscaling:
+              enabled: true
+              initial-concurrent-task-pollers: "\${WF_DATA_PROCESSING_MIN_POLLER_SIZE:1}"
+              min-concurrent-task-pollers: "\${WF_DATA_PROCESSING_MIN_POLLER_SIZE:1}"
+              max-concurrent-task-pollers: "\${WF_DATA_PROCESSING_MAX_POLLER_SIZE:3}"
 management:
   info:
     build.enabled: true
@@ -102,6 +113,13 @@ rest:
 schedule:
   assessments-classifications-process:
     cron-expression: "\${SCHEDULE_ASSESSMENTS_CLASSIFICATIONS_PROCESS_CRON:0 1/6 * * *}" # each day, 01:00-07:00-13:00-19:00 (Europe/Rome)
+
+temporal:
+  timeouts:
+    system-info: "\${TEMPORAL_TIMEOUT_SYSTEM_INFO_SECONDS:5}"
+    rpc-long-poll: "\${TEMPORAL_TIMEOUT_RPC_LONG_POLL_SECONDS:70}"
+    rpc-query: "\${TEMPORAL_TIMEOUT_RPC_QUERY_SECONDS:10}"
+    rpc-generic: "\${TEMPORAL_TIMEOUT_RPC_GENERIC_SECONDS:10}"
 
 workflow:
   default:

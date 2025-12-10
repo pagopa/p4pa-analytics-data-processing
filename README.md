@@ -69,23 +69,27 @@ See [application.yml](src/main/resources/application.yml) for each configurable 
 #### 🔁 Integrations
 
 ##### 🕒 Temporal.io
-| ENV                                                       | DESCRIPTION                                                            | DEFAULT   |
-|-----------------------------------------------------------|------------------------------------------------------------------------|-----------|
-| TEMPORAL_SERVER_HOST                                      | Temporal hostname                                                      | localhost |
-| TEMPORAL_SERVER_PORT                                      | Temporal port                                                          | 7233      |
-| TEMPORAL_SERVER_ENABLE_HTTPS                              | To use HTTPS when invoking Temporal                                    | false     |
-| TEMPORAL_SERVER_NAMESPACE                                 | Temporal namespace                                                     | pu        |
-| DEFAULT_ACTIVITY_CONFIG_START_TO_CLOSE_TIMEOUT_IN_SECONDS | Default startToClose activity timeout (seconds)                        | 300       |
-| DEFAULT_ACTIVITY_CONFIG_RETRY_INITIAL_INTERVAL_IN_MILLIS  | Default initial interval to wait during retries (milliseconds)         | 1000      |
-| DEFAULT_ACTIVITY_CONFIG_RETRY_BACKOFF_COEFFICIENT         | Default backoff coefficient used to increase the delay between retries | 1.5       |
-| DEFAULT_ACTIVITY_CONFIG_RETRY_MAXIMUM_ATTEMPTS            | Default maximum number of retries                                      | 30        |
+| ENV                                                       | DESCRIPTION                                                            | DEFAULT      |
+|-----------------------------------------------------------|------------------------------------------------------------------------|--------------|
+| TEMPORAL_SERVER_HOST                                      | Temporal hostname                                                      | localhost    |
+| TEMPORAL_SERVER_PORT                                      | Temporal port                                                          | 7233         |
+| TEMPORAL_SERVER_ENABLE_HTTPS                              | To use HTTPS when invoking Temporal                                    | false        |
+| TEMPORAL_SERVER_NAMESPACE                                 | Temporal namespace                                                     | pu-analytics |
+| TEMPORAL_TIMEOUT_SYSTEM_INFO_SECONDS                      | Timeout set to wait for SystemInfo invokes (seconds)                   | 5            |
+| TEMPORAL_TIMEOUT_RPC_LONG_POLL_SECONDS                    | Timeout set to wait for long poll RPCs (seconds)                       | 70           |
+| TEMPORAL_TIMEOUT_RPC_QUERY_SECONDS                        | Timeout set to wait for query RPCs (seconds)                           | 10           |
+| TEMPORAL_TIMEOUT_RPC_GENERIC_SECONDS                      | Timeout set to wait for other RPCs (seconds)                           | 10           |
+| DEFAULT_ACTIVITY_CONFIG_START_TO_CLOSE_TIMEOUT_IN_SECONDS | Default startToClose activity timeout (seconds)                        | 300          |
+| DEFAULT_ACTIVITY_CONFIG_RETRY_INITIAL_INTERVAL_IN_MILLIS  | Default initial interval to wait during retries (milliseconds)         | 1000         |
+| DEFAULT_ACTIVITY_CONFIG_RETRY_BACKOFF_COEFFICIENT         | Default backoff coefficient used to increase the delay between retries | 1.5          |
+| DEFAULT_ACTIVITY_CONFIG_RETRY_MAXIMUM_ATTEMPTS            | Default maximum number of retries                                      | 30           |
 
 See `workflow.*` properties on [application.yml](src/main/resources/application.yml) to check configuration for each workflow.
 
 ###### 📥 TaskQueue poller sizes
-| ENV                            | DESCRIPTION                                                       | DEFAULT |
-|--------------------------------|-------------------------------------------------------------------|---------|
-| WF_DATA_PROCESSING_POLLER_SIZE | Poller size configured for Temporal task queue `DataProcessingWF` | 5       |
+See the following properties for poller sizes:
+* `spring.temporal.workers[*].capacity.workflow-task-pollers-configuration.poller-behavior-autoscaling`
+* `spring.temporal.workers[*].capacity.activity-task-pollers-configuration.poller-behavior-autoscaling`
 
 #### 💼 Business logic
 | ENV                                               | DESCRIPTION                                                                  | DEFAULT    |
