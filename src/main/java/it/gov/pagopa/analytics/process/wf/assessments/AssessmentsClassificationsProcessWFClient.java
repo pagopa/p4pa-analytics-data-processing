@@ -28,7 +28,7 @@ public class AssessmentsClassificationsProcessWFClient {
     String taskQueue = TaskQueueConstants.TASK_QUEUE_DATA_PROCESSING;
     String workflowId = generateWorkflowId(ON_DEMAND, AssessmentsClassificationsProcessWF.class);
 
-    AssessmentsClassificationsProcessWF workflow = workflowService.buildWorkflowStub(
+    AssessmentsClassificationsProcessWF workflow = workflowService.buildWorkflowStubToStartNew(
       AssessmentsClassificationsProcessWF.class,
       taskQueue,
       workflowId);

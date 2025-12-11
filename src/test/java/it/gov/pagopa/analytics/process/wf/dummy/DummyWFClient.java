@@ -28,7 +28,7 @@ public class DummyWFClient {
     String taskQueue = TaskQueueConstants.TASK_QUEUE_DATA_PROCESSING;
     String workflowId = generateWorkflowId(ON_DEMAND, DummyWF.class);
 
-    DummyWF workflow = workflowService.buildWorkflowStub(
+    DummyWF workflow = workflowService.buildWorkflowStubToStartNew(
       DummyWF.class,
       taskQueue,
       workflowId);

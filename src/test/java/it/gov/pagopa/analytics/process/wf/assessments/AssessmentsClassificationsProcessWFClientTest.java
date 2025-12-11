@@ -44,7 +44,7 @@ class AssessmentsClassificationsProcessWFClientTest {
     String taskQueue = TaskQueueConstants.TASK_QUEUE_DATA_PROCESSING;
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("AssessmentsClassificationsProcessWF-ON-DEMAND", "RUNID");
 
-    Mockito.when(workflowServiceMock.buildWorkflowStub(AssessmentsClassificationsProcessWF.class, taskQueue, expectedResult.getWorkflowId()))
+    Mockito.when(workflowServiceMock.buildWorkflowStubToStartNew(AssessmentsClassificationsProcessWF.class, taskQueue, expectedResult.getWorkflowId()))
       .thenReturn(wfMock);
 
     TemporalTestUtils.configureWorkflowClientServiceMock(workflowClientServiceMock, expectedResult);

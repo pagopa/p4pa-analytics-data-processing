@@ -39,7 +39,7 @@ public class ControllerExceptionHandler {
     return handleException(ex, request, HttpStatus.CONFLICT, ErrorDTO.CodeEnum.CONFLICT);
   }
 
-  @ExceptionHandler({WorkflowNotFoundException.class})
+  @ExceptionHandler({WorkflowNotFoundException.class, io.temporal.client.WorkflowNotFoundException.class})
   public ResponseEntity<ErrorDTO> handleNotFoundException(RuntimeException ex, HttpServletRequest request) {
     return handleException(ex, request, HttpStatus.NOT_FOUND, ErrorDTO.CodeEnum.NOT_FOUND);
   }
