@@ -66,6 +66,7 @@ select
   ingestion_flow_file_type,
   ingestion_flow_file_id,
   operator_external_user_id,
+  trace_id,
   event_type,
   event_date_time,
   event_description,

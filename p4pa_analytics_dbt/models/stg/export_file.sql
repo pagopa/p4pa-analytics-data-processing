@@ -42,6 +42,7 @@ select
   event_type,
   event_date_time,
   event_description,
+  trace_id,
   -- technical fields
   target_processed_time as processed_time
 from source
