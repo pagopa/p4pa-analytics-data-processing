@@ -1,7 +1,6 @@
 {{ config(
     materialized = "incremental",
-    unique_key = "ingestion_pk",
-    incremental_strategy = "merge",
+    incremental_strategy = "append",
     )
 }}
 
