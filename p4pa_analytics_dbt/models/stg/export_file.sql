@@ -1,7 +1,6 @@
 {{ config(
     materialized = "incremental",
-    unique_key = "export_file_pk",
-    incremental_strategy = "merge",
+    incremental_strategy = "append",
     )
 }}
 
