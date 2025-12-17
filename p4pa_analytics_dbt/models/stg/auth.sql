@@ -67,13 +67,13 @@ select
   vendor,
   product,
   event_type,
-  suser as source_user_name,
-  rt as receipt_time,
   description,
+  rt as receipt_time,
+  trace_id,
+  suser as source_user_name,
   grant_type,
   organization_id,
   organization_name,
-  trace_id,
   -- technical fields
   target_processed_time as processed_time
 from elaborated_source es
