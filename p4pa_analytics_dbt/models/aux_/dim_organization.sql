@@ -20,8 +20,8 @@ with base as (
 source as (
   select distinct
     {{ dbt_utils.generate_surrogate_key(['organization_id']) }} as organization_pk,
-    organization_id,
-    organization_name,
+    coalesce(organization_id, -1) as organization_id,
+    coalesce(organization_name, 'none') as organization_name,
     hash_checksum
   from base as b
   where rn = 1
