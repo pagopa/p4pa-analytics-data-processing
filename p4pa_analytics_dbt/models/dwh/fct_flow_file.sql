@@ -4,9 +4,6 @@
     )
 }}
 
--- depends_on = {{ ref('ingestion') }}
--- depends_on = {{ ref('export_file') }}
-
 with base as (
     -- INGESTION
   select
@@ -84,6 +81,5 @@ select
     operator_external_user_id,
     operator_type,
     event_date_pk,
-    processed_time,
-    target_processed_time
+    target_processed_time as processed_time,
     from source
