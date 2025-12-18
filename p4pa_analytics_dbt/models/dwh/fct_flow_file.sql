@@ -23,7 +23,7 @@ with base as (
     	end as operator_type,
         event_date,
         processed_time
-  from {{ ref('stg.ingestion') }}
+  from {{ ref('ingestion') }}
   union all
   -- EXPORT
   select
@@ -43,7 +43,7 @@ with base as (
     	end as operator_type,
     	event_date,
       processed_time
-  from {{ ref('stg.export_file') }}
+  from {{ ref('export_file') }}
  ),
 
 source as (
