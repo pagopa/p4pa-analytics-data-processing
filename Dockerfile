@@ -4,11 +4,11 @@
 # 🎯 Version Management
 #
 ARG IMAGE="public.ecr.aws/docker/library/eclipse-temurin"
-ARG IMAGE_VERSION="21-alpine-3.21"
-ARG IMAGE_SHA="cafcfad1d9d3b6e7dd983fa367f085ca1c846ce792da59bcb420ac4424296d56"
-ARG GRADLE_VERSION="8.10.2"
-ARG GRADLE_DOWNLOAD_SHA256="31c55713e40233a8303827ceb42ca48a47267a0ad4bab9177123121e71524c26"
-ARG APPINSIGHTS_VERSION="3.7.4"
+ARG IMAGE_VERSION="21-alpine-3.22"
+ARG IMAGE_SHA="c4799f335a65b1ecca8a31239b05522f2b0a184d6818f6349e83484ee6956198"
+ARG GRADLE_VERSION="8.14.3"
+ARG GRADLE_DOWNLOAD_SHA256="bd71102213493060956ec229d946beee57158dbd89d0e62b91bca0fa2c5f3531"
+ARG APPINSIGHTS_VERSION="3.7.6"
 
 # 🌍 Timezone Configuration
 ARG TZ="Europe/Rome"
@@ -35,11 +35,11 @@ ARG APP_GROUP
 
 # Install base packages
 RUN apk add --no-cache \
-    bash \
-    git \
-    shadow \
+    wget \
     unzip \
-    wget
+    bash \
+    shadow \
+    git
 
 # Create Gradle user
 RUN groupadd --system --gid 1000 ${APP_GROUP} && \
@@ -74,10 +74,10 @@ RUN echo "Downloading Gradle ${GRADLE_VERSION}..." && \
     mv "gradle-${GRADLE_VERSION}" "${GRADLE_HOME}" && \
     ln -s "${GRADLE_HOME}/bin/gradle" /usr/bin/gradle && \
     rm gradle.zip && \
-    # Setup Gradle user directories \
+    # Setup Gradle user directories
     mkdir -p /home/${APP_USER}/.gradle && \
     chown --recursive ${APP_USER}:${APP_GROUP} /home/${APP_USER} && \
-    # Verify installation \
+    # Verify installation
     echo "Verifying Gradle installation..." && \
     gradle --version
 
@@ -88,8 +88,6 @@ VOLUME /home/${APP_USER}/.gradle
 # 📚 Dependencies Stage
 #
 FROM gradle-setup AS dependencies
-ARG APP_USER
-ARG APP_GROUP
 
 WORKDIR /build
 
@@ -112,8 +110,6 @@ RUN gradle dependenciesBuild dependencies --no-daemon
 # 🏗️ Build Stage
 #
 FROM dependencies AS build
-ARG APP_USER
-ARG APP_GROUP
 
 # Copy source code
 COPY --chown=${APP_USER}:${APP_GROUP} src src/
@@ -128,6 +124,7 @@ FROM ${IMAGE}:${IMAGE_VERSION}@sha256:${IMAGE_SHA} AS runtime
 ARG APP_USER
 ARG APP_GROUP
 ARG APP_HOME
+ARG APPINSIGHTS_VERSION
 ARG TZ
 
 WORKDIR ${APP_HOME}
@@ -138,36 +135,13 @@ ENV TZ=${TZ}
 # 🛡️ Security Setup and Timezone
 RUN apk upgrade --no-cache && \
     apk add --no-cache \
-        curl \
-        python3 \
         tini \
-        # Configure timezone + ENV=TZ \
+        curl \
+        # Configure timezone + ENV=TZ
         tzdata && \
-    # Create user and group \
+    # Create user and group
     addgroup -S ${APP_GROUP} && \
-    adduser -S ${APP_USER} -G ${APP_GROUP} && \
-    # Install dbt-core \
-    python3 -m venv .venv && \
-    source .venv/bin/activate && \
-    python -m ensurepip --upgrade && \
-    python -m pip install dbt-core dbt-postgres && \
-    dbt --version && \
-    echo source .venv/bin/activate >> /etc/profile && \
-    echo PATH="$PATH" >> /etc/profile && \
-    chmod +x /etc/profile
-
-# Copy dbt project
-COPY --chown=${APP_USER}:${APP_GROUP} p4pa_analytics_dbt dbt/
-
-# Install dbt packages
-RUN source .venv/bin/activate && \
-    dbt deps --project-dir dbt
-
-FROM runtime
-ARG APP_USER
-ARG APP_GROUP
-ARG APP_HOME
-ARG APPINSIGHTS_VERSION
+    adduser -S ${APP_USER} -G ${APP_GROUP}
 
 # 📦 Copy Artifacts
 COPY --from=build /build/build/libs/*.jar ${APP_HOME}/app.jar
@@ -182,4 +156,4 @@ USER ${APP_USER}
 
 # 🎬 Startup Configuration
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["/bin/sh", "-l", "-c", "java -jar /app/app.jar"]
+CMD ["java", "-jar", "/app/app.jar"]
