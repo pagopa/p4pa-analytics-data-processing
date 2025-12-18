@@ -81,5 +81,5 @@ select
     operator_external_user_id,
     operator_type,
     event_date_pk,
-    target_processed_time as processed_time,
+    target_processed_time as processed_time
     from source
