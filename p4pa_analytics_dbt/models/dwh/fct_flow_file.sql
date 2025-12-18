@@ -59,7 +59,7 @@ source as (
     operator_external_user_id,
     operator_type,
     {{ dbt_utils.generate_surrogate_key(['event_date']) }} as event_date_pk,
-    processed_time as src_processed_time,
+    processed_time,
     current_timestamp as target_processed_time
 
     from base as b
@@ -81,6 +81,6 @@ select
     operator_external_user_id,
     operator_type,
     event_date_pk,
-    src_processed_time,
+    processed_time,
     target_processed_time
     from source
