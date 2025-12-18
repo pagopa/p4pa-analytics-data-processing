@@ -41,7 +41,7 @@ with source as (
     (i.ingestion_payload -> 'payload' ->> 'operatorExternalUserId')::varchar(255) as operator_external_user_id,
     (i.ingestion_payload ->> 'traceId')::varchar(255) as trace_id,
     (i.ingestion_payload ->> 'eventType')::varchar(255) as event_type,
-    (i.ingestion_payload ->> 'eventDateTime')::timestamp  as event_date_time,
+    (i.ingestion_payload ->> 'eventDateTime')::date as event_date,
     (i.ingestion_payload ->> 'eventDescription')::text as event_description,
     current_timestamp as target_processed_time
 
@@ -67,7 +67,7 @@ select
   operator_external_user_id,
   trace_id,
   event_type,
-  event_date_time,
+  event_date,
   event_description,
   -- technical fields
   target_processed_time as processed_time

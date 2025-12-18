@@ -16,7 +16,7 @@ with source as (
     (ex.export_file_payload -> 'payload' ->> 'organizationId')::bigint as organization_id,
     (ex.export_file_payload -> 'payload' ->> 'operatorExternalUserId')::varchar(256) as operator_external_user_id,
     (ex.export_file_payload ->> 'eventType')::varchar(256) as event_type,
-    (ex.export_file_payload ->> 'eventDateTime')::timestamp  as event_date_time,
+    (ex.export_file_payload ->> 'eventDateTime')::date as event_date,
     (ex.export_file_payload ->> 'eventDescription')::text as event_description,
     (ex.export_file_payload ->> 'traceId')::varchar(256) as trace_id,
     current_timestamp as target_processed_time
@@ -39,7 +39,7 @@ select
   organization_id,
   operator_external_user_id,
   event_type,
-  event_date_time,
+  event_date,
   event_description,
   trace_id,
   -- technical fields
