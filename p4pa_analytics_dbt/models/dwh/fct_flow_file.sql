@@ -4,6 +4,9 @@
     )
 }}
 
+-- depends_on = {{ ref('ingestion') }}
+-- depends_on = {{ ref('export_file') }}
+
 with base as (
     -- INGESTION
   select
