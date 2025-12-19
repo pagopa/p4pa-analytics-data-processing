@@ -7,7 +7,7 @@
 with base as (
     -- INGESTION
   select
-        {{ dbt_utils.generate_surrogate_key(['event_type','ingestion_pk']) }} as fct_flow_file_pk,
+        {{ dbt_utils.generate_surrogate_key(["'INGESTION'",'ingestion_pk']) }} as fct_flow_file_pk,
         event_type,
         ingestion_flow_file_type as flow_type,
         status,
@@ -24,10 +24,13 @@ with base as (
         event_date,
         processed_time
   from {{ ref('ingestion') }}
+  {% if is_incremental() %}
+        where processed_time >= (select coalesce(max(processed_time), '1900-01-01') from {{ this }} )
+  {% endif %}
   union all
   -- EXPORT
   select
-        {{ dbt_utils.generate_surrogate_key(['event_type','export_file_pk']) }} as fct_flow_file_pk,
+        {{ dbt_utils.generate_surrogate_key(["'EXPORT_FILE'",'export_file_pk']) }} as fct_flow_file_pk,
         event_type,
         export_file_type as flow_type,
         'COMPLETED' as status,
@@ -44,6 +47,9 @@ with base as (
     	event_date,
       processed_time
   from {{ ref('export_file') }}
+  {% if is_incremental() %}
+        where processed_time >= (select coalesce(max(processed_time), '1900-01-01') from {{ this }} )
+  {% endif %}
  ),
 
 source as (
@@ -63,10 +69,6 @@ source as (
     current_timestamp as target_processed_time
 
     from base as b
-
-    {% if is_incremental() %}
-    where b.processed_time >= (select coalesce(max(processed_time), '1900-01-01') from {{ this }} )
-    {% endif %}
 )
 
 select
