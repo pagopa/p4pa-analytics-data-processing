@@ -1,6 +1,5 @@
 package it.gov.pagopa.analytics.process.exception;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
 import io.temporal.client.WorkflowExecutionAlreadyStarted;
 import it.gov.pagopa.analytics.process.dto.generated.ErrorDTO;
 import it.gov.pagopa.analytics.process.exception.custom.WorkflowInternalErrorException;
@@ -26,6 +25,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DatabindException;
 
 import java.util.stream.Collectors;
 
@@ -104,10 +105,10 @@ public class ControllerExceptionHandler {
   private static String buildReturnedMessage(Exception ex) {
     switch (ex) {
       case HttpMessageNotReadableException httpMessageNotReadableException -> {
-        if (httpMessageNotReadableException.getCause() instanceof JsonMappingException jsonMappingException) {
+        if (httpMessageNotReadableException.getCause() instanceof DatabindException jsonMappingException) {
           return "Cannot parse body. " +
             jsonMappingException.getPath().stream()
-              .map(JsonMappingException.Reference::getFieldName)
+              .map(JacksonException.Reference::getPropertyName)
               .collect(Collectors.joining(".")) +
             ": " + jsonMappingException.getOriginalMessage();
         }
