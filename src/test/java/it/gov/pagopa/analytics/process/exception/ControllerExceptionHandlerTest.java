@@ -6,6 +6,7 @@ import io.temporal.client.WorkflowExecutionAlreadyStarted;
 import it.gov.pagopa.analytics.process.config.json.JsonConfig;
 import it.gov.pagopa.analytics.process.exception.custom.WorkflowInternalErrorException;
 import it.gov.pagopa.analytics.process.exception.custom.WorkflowNotFoundException;
+import it.gov.pagopa.analytics.process.utils.TestUtils;
 import it.gov.pagopa.analytics.process.utils.UtilitiesTest;
 import jakarta.servlet.ServletException;
 import jakarta.validation.ConstraintViolationException;
@@ -78,6 +79,11 @@ class ControllerExceptionHandlerTest {
     String testEndpoint(@RequestParam(DATA) String data, @Valid @RequestBody TestRequestBody body) {
       return "OK";
     }
+  }
+
+  @BeforeEach
+  void init() {
+    TestUtils.clearDefaultTimezone();
   }
 
   @Data
