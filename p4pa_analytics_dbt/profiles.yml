@@ -1,0 +1,12 @@
+p4pa_analytics_dbt:
+  outputs:
+    dev:
+      dbname: analytics
+      host: "{{ env_var('ANALYTICS_DB_HOST') }}"
+      pass: "{{ env_var('ANALYTICS_DB_PASSWORD') }}"
+      port: 5432
+      threads: 1
+      schema: public
+      type: postgres
+      user: "{{ env_var('ANALYTICS_DB_USER') }}"
+  target: dev
