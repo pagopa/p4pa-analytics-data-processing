@@ -74,10 +74,10 @@ RUN echo "Downloading Gradle ${GRADLE_VERSION}..." && \
     mv "gradle-${GRADLE_VERSION}" "${GRADLE_HOME}" && \
     ln -s "${GRADLE_HOME}/bin/gradle" /usr/bin/gradle && \
     rm gradle.zip && \
-    # Setup Gradle user directories
+    # Setup Gradle user directories \
     mkdir -p /home/${APP_USER}/.gradle && \
     chown --recursive ${APP_USER}:${APP_GROUP} /home/${APP_USER} && \
-    # Verify installation
+    # Verify installation \
     echo "Verifying Gradle installation..." && \
     gradle --version
 
@@ -137,11 +137,28 @@ RUN apk upgrade --no-cache && \
     apk add --no-cache \
         tini \
         curl \
-        # Configure timezone + ENV=TZ
+        python3 \
+        # Configure timezone + ENV=TZ \
         tzdata && \
-    # Create user and group
+    # Create user and group \
     addgroup -S ${APP_GROUP} && \
-    adduser -S ${APP_USER} -G ${APP_GROUP}
+    adduser -S ${APP_USER} -G ${APP_GROUP} && \
+    # Install dbt-core \
+    python3 -m venv .venv && \
+    source .venv/bin/activate && \
+    python -m ensurepip --upgrade && \
+    python -m pip install dbt-core dbt-postgres && \
+    dbt --version && \
+    echo source .venv/bin/activate >> /etc/profile && \
+    echo PATH="$PATH" >> /etc/profile && \
+    chmod +x /etc/profile
+
+# Copy dbt project
+COPY --chown=${APP_USER}:${APP_GROUP} p4pa_analytics_dbt dbt/
+# Install dbt packages
+RUN source .venv/bin/activate && \
+    dbt deps --project-dir dbt
+
 
 # 📦 Copy Artifacts
 COPY --from=build /build/build/libs/*.jar ${APP_HOME}/app.jar
@@ -156,4 +173,4 @@ USER ${APP_USER}
 
 # 🎬 Startup Configuration
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["java", "-jar", "/app/app.jar"]
+CMD ["/bin/sh", "-l", "-c", "java", "-jar", "/app/app.jar"]
