@@ -173,4 +173,4 @@ USER ${APP_USER}
 
 # 🎬 Startup Configuration
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["/bin/sh", "-l", "-c", "java", "-jar", "/app/app.jar"]
+CMD ["java", "-jar", "/app/app.jar"]
