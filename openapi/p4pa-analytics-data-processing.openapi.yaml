@@ -130,6 +130,8 @@ components:
         duration:
           type: string
           format: duration
+        result:
+          type: string
     ScheduleInfoDTO:
       type: object
       required:
@@ -171,6 +173,11 @@ components:
           type: string
           format: date-time
         lastUpdatedAt:
+          type: string
+          format: date-time
+        lastManualExecution:
+          $ref: '#/components/schemas/WorkflowStatusDTO'
+        lastExecution:
           type: string
           format: date-time
     ScheduleExecutionInfoDTO:

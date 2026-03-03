@@ -217,6 +217,9 @@
           },
           "duration" : {
             "type" : "string"
+          },
+          "result" : {
+            "type" : "string"
           }
         },
         "required" : [ "runId", "status", "taskQueue", "workflowId", "workflowType" ]
@@ -299,6 +302,13 @@
             "format" : "date-time"
           },
           "lastUpdatedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "lastManualExecution" : {
+            "$ref" : "#/components/schemas/WorkflowStatusDTO"
+          },
+          "lastExecution" : {
             "type" : "string",
             "format" : "date-time"
           }
