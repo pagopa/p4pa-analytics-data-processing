@@ -53,6 +53,7 @@ val openApiToolsVersion = "0.2.9"
 val micrometerVersion = "1.6.3"
 val bouncycastleVersion = "1.83"
 val httpClientVersion = "5.6"
+val httpCoreVersion = "5.4.1"
 val commonsLang3Version = "3.20.0"
 val temporalVersion = "1.33.0"
 val protobufJavaVersion = "4.34.0"
@@ -86,6 +87,7 @@ dependencies {
   implementation ("org.mapstruct:mapstruct:${mapStructVersion}")
   implementation ("org.bouncycastle:bcprov-jdk18on:${bouncycastleVersion}")
   implementation("org.apache.httpcomponents.client5:httpclient5:$httpClientVersion")
+  implementation("org.apache.httpcomponents.core5:httpcore5:$httpCoreVersion")
   // Temporal
   implementation("io.temporal:temporal-spring-boot-starter:$temporalVersion") {
     exclude(group = "com.google.protobuf", module = "protobuf-java")
