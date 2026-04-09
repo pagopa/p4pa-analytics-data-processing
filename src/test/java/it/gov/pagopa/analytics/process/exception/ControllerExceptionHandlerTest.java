@@ -133,7 +133,7 @@ class ControllerExceptionHandlerTest {
     performRequest(DATA, MediaType.APPLICATION_JSON)
       .andExpect(MockMvcResultMatchers.status().isConflict())
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("CONFLICT"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("workflowId='null', runId='null"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("workflowId='null', runId='null'"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -156,7 +156,7 @@ class ControllerExceptionHandlerTest {
     performRequest(DATA, MediaType.APPLICATION_JSON)
       .andExpect(MockMvcResultMatchers.status().isNotFound())
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("NOT_FOUND"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("workflowId='null', runId='null"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("workflowId='null', runId='null'"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
