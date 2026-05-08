@@ -16,6 +16,14 @@ data "azurerm_key_vault" "key_vault_domain" {
   resource_group_name = "${var.prefix}-${var.env_short}-${var.location_short}-${var.domain}-sec-rg"
 }
 
+# Key Vault - GitHub Token
+data "azurerm_key_vault_secret" "github_token" {
+  count = var.env_short == "p" ? 1 : 0
+
+  key_vault_id = data.azurerm_key_vault.key_vault_core.id
+  name         = "azure-devops-github-rw-TOKEN"
+}
+
 # Key Vault - Sonar Token
 data "azurerm_key_vault_secret" "sonar_token" {
   count = var.env_short == "p" ? 1 : 0
@@ -24,10 +32,18 @@ data "azurerm_key_vault_secret" "sonar_token" {
   name         = "sonar-cloud-token"
 }
 
-# Key Vault - Slack webhok
+# Key Vault - Slack webhook
 data "azurerm_key_vault_secret" "slack_webhook" {
   count = var.env_short == "p" ? 1 : 0
 
   key_vault_id = data.azurerm_key_vault.key_vault_core.id
   name         = "slack-webhook-url"
+}
+
+# Key Vault - Azure DevOps Token
+data "azurerm_key_vault_secret" "azure_devops_token" {
+  count = var.env_short == "p" ? 1 : 0
+
+  key_vault_id = data.azurerm_key_vault.key_vault_core.id
+  name         = "azure-devops-token"
 }

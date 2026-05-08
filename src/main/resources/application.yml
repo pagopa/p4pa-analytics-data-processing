@@ -9,11 +9,40 @@ spring:
   threads:
     virtual:
       enabled: true
+  temporal:
+    namespace: "\${TEMPORAL_SERVER_NAMESPACE:pu-analytics}"
+    connection:
+      enable-https: "\${TEMPORAL_SERVER_ENABLE_HTTPS:false}"
+      target: "\${TEMPORAL_SERVER_HOST:localhost}:\${TEMPORAL_SERVER_PORT:7233}"
+    workers-auto-discovery:
+      packages:
+        - it.gov.pagopa.analytics.process.wf
+    workers:
+      # generic
+      - task-queue: DataProcessingWF
+        capacity:
+          workflow-task-pollers-configuration:
+            poller-behavior-autoscaling:
+              enabled: true
+              initial-concurrent-task-pollers: "\${WF_DATA_PROCESSING_MIN_POLLER_SIZE:1}"
+              min-concurrent-task-pollers: "\${WF_DATA_PROCESSING_MIN_POLLER_SIZE:1}"
+              max-concurrent-task-pollers: "\${WF_DATA_PROCESSING_MAX_POLLER_SIZE:3}"
+          activity-task-pollers-configuration:
+            poller-behavior-autoscaling:
+              enabled: true
+              initial-concurrent-task-pollers: "\${WF_DATA_PROCESSING_MIN_POLLER_SIZE:1}"
+              min-concurrent-task-pollers: "\${WF_DATA_PROCESSING_MIN_POLLER_SIZE:1}"
+              max-concurrent-task-pollers: "\${WF_DATA_PROCESSING_MAX_POLLER_SIZE:3}"
 management:
   info:
     build.enabled: true
     java.enabled: true
     git.enabled: true
+  otlp.metrics.export.enabled: "\${TRACING_EXPORT:false}"
+  tracing:
+    sampling.probability: "\${TRACING_SAMPLING_PROBABILITY:1.0}"
+    baggage.remote-fields:
+      - X-user-id
   observations:
     http.server:
       filter.order: -100
@@ -55,11 +84,27 @@ logging:
     it.gov.pagopa: "\${LOG_LEVEL_PAGOPA:INFO}"
     org.springframework: "\${LOG_LEVEL_SPRING:INFO}"
     org.springframework.boot.availability: "\${LOG_LEVEL_SPRING_BOOT_AVAILABILITY:DEBUG}"
-    it.gov.pagopa.template.exception.ControllerExceptionHandler: "\${LOGGING_LEVEL_API_REQUEST_EXCEPTION:INFO}"
+    it.gov.pagopa.analytics.process.exception.ControllerExceptionHandler: "\${LOGGING_LEVEL_API_REQUEST_EXCEPTION:INFO}"
     org.springdoc.core.utils.SpringDocAnnotationsUtils: "\${LOG_LEVEL_SPRING_DOC:ERROR}"
     PERFORMANCE_LOG: "\${LOG_LEVEL_PERFORMANCE_LOG:INFO}"
     PERFORMANCE_LOG.API_REQUEST: "\${LOG_LEVEL_PERFORMANCE_LOG_API_REQUEST:\${logging.level.PERFORMANCE_LOG}}"
     PERFORMANCE_LOG.REST_INVOKE: "\${LOG_LEVEL_PERFORMANCE_LOG_REST_INVOKE:\${logging.level.PERFORMANCE_LOG}}"
+
+springdoc:
+  api-docs.version: openapi_3_0
+  writer-with-default-pretty-printer: true
+
+jwt:
+  access-token:
+    public-key: "\${JWT_TOKEN_PUBLIC_KEY:-----BEGIN PUBLIC KEY-----
+                MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2ovm/rd3g69dq9PisinQ
+                6mWy8ZttT8D+GKXCsHZycsGnN7b74TPyYy+4+h+9cgJeizp8RDRrufHjiBrqi/2r
+                eOk/rD7ZHbpfQvHK8MYfgIVdtTxYMX/GGdOrX6/5TV2b8e2aCG6GmxF0UuEvxY9o
+                TmcZUxnIeDtl/ixz4DQ754eS363qWfEA92opW+jcYzr07sbQtR86e+Z/s/CUeX6W
+                1PHNvBqdlAgp2ecr/1DOLq1D9hEANBPSwbt+FM6FNe4vLphi7GTwiB0yaAuy+jE8
+                odND6HPvvvmgbK1/2qTHn/HJjWUm11LUC73BszR32BKbdEEhxPQnnwswVekWzPi1
+                IwIDAQAB
+                -----END PUBLIC KEY-----}"
 
 rest:
   defaults:
@@ -70,3 +115,28 @@ rest:
     timeout:
       connect-millis: "\${DEFAULT_REST_TIMEOUT_CONNECT_MILLIS:120000}"
       read-millis: "\${DEFAULT_REST_TIMEOUT_READ_MILLIS:120000}"
+
+schedule:
+  assessments-classifications-process:
+    cron-expression: "\${SCHEDULE_ASSESSMENTS_CLASSIFICATIONS_PROCESS_CRON:0 1/6 * * *}" # each day, 01:00-07:00-13:00-19:00 (Europe/Rome)
+
+temporal:
+  timeouts:
+    system-info: "\${TEMPORAL_TIMEOUT_SYSTEM_INFO_SECONDS:5}"
+    rpc-long-poll: "\${TEMPORAL_TIMEOUT_RPC_LONG_POLL_SECONDS:70}"
+    rpc-query: "\${TEMPORAL_TIMEOUT_RPC_QUERY_SECONDS:10}"
+    rpc-generic: "\${TEMPORAL_TIMEOUT_RPC_GENERIC_SECONDS:10}"
+
+workflow:
+  default:
+    startToCloseTimeoutInSeconds: "\${DEFAULT_ACTIVITY_CONFIG_START_TO_CLOSE_TIMEOUT_IN_SECONDS:300}"
+    retryInitialIntervalInMillis: "\${DEFAULT_ACTIVITY_CONFIG_RETRY_INITIAL_INTERVAL_IN_MILLIS:1000}"
+    retryBackoffCoefficient: "\${DEFAULT_ACTIVITY_CONFIG_RETRY_BACKOFF_COEFFICIENT:1.5}"
+    retryMaximumAttempts: "\${DEFAULT_ACTIVITY_CONFIG_RETRY_MAXIMUM_ATTEMPTS:30}"
+
+  # data processing
+  assessments-classification-process:
+    start-to-close-timeout-in-seconds: "\${ASSESSMENTS_CLASSIFICATIONS_ACTIVITY_CONFIG_START_TO_CLOSE_TIMEOUT_IN_SECONDS:\${workflow.default.startToCloseTimeoutInSeconds}}"
+    retry-initial-interval-in-millis: "\${ASSESSMENTS_CLASSIFICATIONS_ACTIVITY_CONFIG_RETRY_INITIAL_INTERVAL_IN_MILLIS:\${workflow.default.retryInitialIntervalInMillis}}"
+    retry-backoff-coefficient: "\${ASSESSMENTS_CLASSIFICATIONS_ACTIVITY_CONFIG_RETRY_BACKOFF_COEFFICIENT:\${workflow.default.retryBackoffCoefficient}}"
+    retry-maximum-attempts: "\${ASSESSMENTS_CLASSIFICATIONS_ACTIVITY_CONFIG_RETRY_MAXIMUM_ATTEMPTS:\${workflow.default.retryMaximumAttempts}}"
