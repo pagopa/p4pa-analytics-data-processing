@@ -153,12 +153,9 @@ RUN apk upgrade --no-cache && \
     echo PATH="$PATH" >> /etc/profile && \
     chmod +x /etc/profile
 
-# Copy dbt project
+# Copy dbt project and scripts
 COPY --chown=${APP_USER}:${APP_GROUP} p4pa_analytics_dbt dbt/
-# Install dbt packages
-RUN source .venv/bin/activate && \
-    dbt deps --project-dir dbt
-
+COPY --chown=${APP_USER}:${APP_GROUP} script script/
 
 # 📦 Copy Artifacts
 COPY --from=build /build/build/libs/*.jar ${APP_HOME}/app.jar

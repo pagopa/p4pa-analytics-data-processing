@@ -20,8 +20,7 @@ public class AssessmentsClassificationProcessingActivityImpl implements Assessme
   @Override
   public String executeAssessmentsClassificationProcessingActivity() {
     log.info("Executing AssessmentsClassificationProcessing activity");
-    String[] dbtCommand = new String[]{"dbt", "run", "--project-dir", "/app/dbt", "--profiles-dir", "/app/dbt",
-      "--target-path", "/tmp/dbt/target", "--log-path", "/tmp/dbt/logs"};
+    String[] dbtCommand = new String[]{"./script/dbt_execute.sh"};
     return "Command executed with exitStatus:" + commandExecutor.executeCommandActivity(dbtCommand);
   }
 }
