@@ -139,7 +139,8 @@ RUN apk upgrade --no-cache && \
         curl \
         python3 \
         # Configure timezone + ENV=TZ \
-        tzdata && \
+        tzdata \ 
+        git  && \
     # Create user and group \
     addgroup -S ${APP_GROUP} && \
     adduser -S ${APP_USER} -G ${APP_GROUP} && \
