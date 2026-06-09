@@ -1,2 +1,0 @@
-#!/bin/sh
-echo "${DBT_ENV_SECRET_GIT_CREDENTIAL}"

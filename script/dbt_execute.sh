@@ -4,10 +4,6 @@ set +x
 
 export DBT_GIT_EXTERNAL_REPO_REVISION=feat-dbt-enterprise-setup # TODO: da rimuovere
 
-# --- Configure git for the authentication ---
-export GIT_ASKPASS=/app/script/git-askpass.sh
-export GIT_TERMINAL_PROMPT=0 
-
 # --- Configuration ---
 DBT_WORKSPACE="/tmp/dbt/source"
 CORE_DBT_PROJECT="/app/dbt"
@@ -28,8 +24,8 @@ if [ -n "${DBT_GIT_EXTERNAL_REPO}" ]; then
   echo "" >> "${DBT_WORKSPACE}/packages.yml"
   # Append git dependency to workspace packages.yml using Jinja for env vars
   cat <<EOF >> "${DBT_WORKSPACE}/packages.yml"
-  - git: https://${DBT_GIT_EXTERNAL_REPO}.git
-    revision: ${DBT_GIT_EXTERNAL_REPO_REVISION}
+  - git: "https://{{env_var('DBT_GIT_USER_NAME')}}:{{env_var('DBT_ENV_SECRET_GIT_CREDENTIAL')}}@{{env_var('DBT_GIT_EXTERNAL_REPO')}}.git"
+    revision: "{{env_var('DBT_GIT_EXTERNAL_REPO_REVISION')}}"
 EOF
 else
   echo "DBT_GIT_EXTERNAL_REPO is not set. Running in core-only mode."
