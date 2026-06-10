@@ -24,7 +24,7 @@ if [ -n "${DBT_GIT_EXTERNAL_REPO}" ]; then
   echo "" >> "${DBT_WORKSPACE}/packages.yml"
   # Append git dependency to workspace packages.yml using Jinja for env vars
   cat <<EOF >> "${DBT_WORKSPACE}/packages.yml"
-  - git: "https://{{env_var('DBT_GIT_USER_NAME')}}:{{env_var('DBT_ENV_SECRET_GIT_CREDENTIAL')}}@{{env_var('DBT_GIT_EXTERNAL_REPO')}}.git"
+  - git: "https://{{env_var('DBT_GIT_USER_NAME')}}:{{env_var('DBT_ENV_SECRET_GIT_CREDENTIAL')}}@{{env_var('DBT_GIT_EXTERNAL_REPO')}}"
     revision: "{{env_var('DBT_GIT_EXTERNAL_REPO_REVISION')}}"
 EOF
 else
