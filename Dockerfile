@@ -156,7 +156,7 @@ RUN apk upgrade --no-cache && \
 
 # Copy dbt project and scripts
 COPY --chown=${APP_USER}:${APP_GROUP} p4pa_analytics_dbt dbt/
-COPY --chown=${APP_USER}:${APP_GROUP} script script/
+COPY --chown=${APP_USER}:${APP_GROUP} --chmod=+x script script/
 
 # 📦 Copy Artifacts
 COPY --from=build /build/build/libs/*.jar ${APP_HOME}/app.jar
