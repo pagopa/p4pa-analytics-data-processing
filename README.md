@@ -51,6 +51,17 @@ See [application.yml](src/main/resources/application.yml) for each configurable 
 
 ### 📌 Relevant configurations
 
+#### 📦 External DBT Models Management
+Dbt models and dependencies can be imported from an external Git repository through `/script/dbt_execute.sh` which injects a Git dependency into the dbt `packages.yml` file at runtime.
+If the environment variable `DBT_GIT_EXTERNAL_REPO` is set, the application will import the external dbt models from the specified repository and the application will run the dbt models defined in this repository together with the external ones. Otherwise, the application will run only the dbt models defined in this repository.
+
+| ENV                            | DESCRIPTION                                                                | DEFAULT                                                     |
+|--------------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------|
+| DBT_GIT_EXTERNAL_REPO          | External Git repository URL containing dbt models                          | github.com/pagopa/p4pa-analytics-data-processing-enterprise |
+| DBT_GIT_USER_NAME              | Username to access the external Git repository                             | username                                                    |
+| DBT_ENV_SECRET_GIT_CREDENTIAL  | Secret credential (e.g., token) to authenticate against the Git repository | git access token                                            |
+| DBT_GIT_EXTERNAL_REPO_REVISION | Git branch to checkout                                                     | develop                                                     |
+
 #### 🌐 Application Server
 | ENV         | DESCRIPTION                       | DEFAULT |
 |-------------|-----------------------------------|---------|
