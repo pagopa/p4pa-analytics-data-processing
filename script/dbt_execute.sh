@@ -2,8 +2,6 @@
 set -e
 set +x
 
-export DBT_GIT_EXTERNAL_REPO_REVISION=feat-dbt-enterprise-setup # TODO: da rimuovere
-
 # --- Configuration ---
 DBT_WORKSPACE="/tmp/dbt/source"
 CORE_DBT_PROJECT="/app/dbt"
