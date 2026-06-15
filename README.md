@@ -62,7 +62,7 @@ If the environment variable `DBT_GIT_EXTERNAL_REPO` is set, the application will
 
 #### 🛠️ External repository structure
 
-TO BE DEFIED
+TO BE DEFINED
 
 ### 📌 Relevant configurations
 
