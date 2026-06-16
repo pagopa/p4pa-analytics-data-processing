@@ -139,7 +139,8 @@ RUN apk upgrade --no-cache && \
         curl \
         python3 \
         # Configure timezone + ENV=TZ \
-        tzdata && \
+        tzdata \ 
+        git  && \
     # Create user and group \
     addgroup -S ${APP_GROUP} && \
     adduser -S ${APP_USER} -G ${APP_GROUP} && \
@@ -153,12 +154,10 @@ RUN apk upgrade --no-cache && \
     echo PATH="$PATH" >> /etc/profile && \
     chmod +x /etc/profile
 
-# Copy dbt project
+# Copy dbt project and scripts
 COPY --chown=${APP_USER}:${APP_GROUP} p4pa_analytics_dbt dbt/
-# Install dbt packages
-RUN source .venv/bin/activate && \
-    dbt deps --project-dir dbt
-
+COPY --chown=${APP_USER}:${APP_GROUP} script script/
+RUN chmod +x /app/script/*
 
 # 📦 Copy Artifacts
 COPY --from=build /build/build/libs/*.jar ${APP_HOME}/app.jar
