@@ -51,22 +51,33 @@ See [application.yml](src/main/resources/application.yml) for each configurable 
 
 ### 📌 Relevant configurations
 
+#### 📦 External DBT Models Management
+Dbt models and dependencies can be imported from an external Git repository through `/script/dbt_execute.sh` which injects a Git dependency into the dbt `packages.yml` file at runtime.
+If the environment variable `DBT_GIT_EXTERNAL_REPO` is set, the application will import the external dbt models from the specified repository and the application will run the dbt models defined in this repository together with the external ones. Otherwise, the application will run only the dbt models defined in this repository.
+
+| ENV                            |                                  DESCRIPTION                                                                         | DEFAULT         |
+|--------------------------------|----------------------------------------------------------------------------------------------------------------------|-----------------|
+| DBT_GIT_EXTERNAL_REPO          | External Git repository URL containing dbt models (ex. github.com/pagopa/p4pa-analytics-data-processing-enterprise)  |                 |
+| DBT_GIT_USER_NAME              | Username to access the external Git repository                                                                       |                 |
+| DBT_ENV_SECRET_GIT_CREDENTIAL  | Secret credential (e.g., token) to authenticate against the Git repository                                           |                 |
+| DBT_GIT_EXTERNAL_REPO_REVISION | Git branch to checkout (ex. develop)                                                                                 |                 |
+
 #### 🌐 Application Server
 | ENV         | DESCRIPTION                       | DEFAULT |
 |-------------|-----------------------------------|---------|
 | SERVER_PORT | Application server listening port | 8080    |
 
 #### ✏️ Logging
-| ENV                                   | DESCRIPTION                                                                                                                                                                     | DEFAULT |
-|---------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| LOG_LEVEL_ROOT                        | Base level                                                                                                                                                                      | INFO    |
-| LOG_LEVEL_PAGOPA                      | Base level of custom classes                                                                                                                                                    | INFO    |
-| LOG_LEVEL_SPRING                      | Level applied to Spring framework                                                                                                                                               | INFO    |
-| LOG_LEVEL_SPRING_BOOT_AVAILABILITY    | To print availability events                                                                                                                                                    | DEBUG   |
-| LOGGING_LEVEL_API_REQUEST_EXCEPTION   | Level applied to APIs exception                                                                                                                                                 | INFO    |
-| LOG_LEVEL_PERFORMANCE_LOG             | Level applied to [PerformanceLog](https://pagopa.atlassian.net/wiki/spaces/SPAC/pages/1540096383/Logging#2.2.-Log-di-performance)                                               | INFO    |
-| LOG_LEVEL_PERFORMANCE_LOG_API_REQUEST | Level applied to [API Performance Log](https://pagopa.atlassian.net/wiki/spaces/SPAC/pages/1540096383/Logging#2.2.2.1.-Log-di-perfomance-per-le-API)                            | INFO    |
-| LOG_LEVEL_PERFORMANCE_LOG_REST_INVOKE | Level applied to [REST invoke Performance Log](https://pagopa.atlassian.net/wiki/spaces/SPAC/pages/1540096383/Logging#2.2.2.2.-Log-di-performance-per-i-servizi-REST-integrati) | INFO    |
+| ENV                                   | DESCRIPTION                                                                                                                                            | DEFAULT |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| LOG_LEVEL_ROOT                        | Base level                                                                                                                                             | INFO    |
+| LOG_LEVEL_PAGOPA                      | Base level of custom classes                                                                                                                           | INFO    |
+| LOG_LEVEL_SPRING                      | Level applied to Spring framework                                                                                                                      | INFO    |
+| LOG_LEVEL_SPRING_BOOT_AVAILABILITY    | To print availability events                                                                                                                           | DEBUG   |
+| LOGGING_LEVEL_API_REQUEST_EXCEPTION   | Level applied to APIs exception                                                                                                                        | INFO    |
+| LOG_LEVEL_PERFORMANCE_LOG             | Level applied to [PerformanceLog](https://raw.githubusercontent.com/pagopa/p4pa-doc/refs/heads/main/reference/technical-docs/Logging.pdf)              | INFO    |
+| LOG_LEVEL_PERFORMANCE_LOG_API_REQUEST | Level applied to [API Performance Log](https://raw.githubusercontent.com/pagopa/p4pa-doc/refs/heads/main/reference/technical-docs/Logging.pdf)         | INFO    |
+| LOG_LEVEL_PERFORMANCE_LOG_REST_INVOKE | Level applied to [REST invoke Performance Log](https://raw.githubusercontent.com/pagopa/p4pa-doc/refs/heads/main/reference/technical-docs/Logging.pdf) | INFO    |
 
 #### 🔁 Integrations
 
