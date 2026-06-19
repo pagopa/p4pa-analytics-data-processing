@@ -19,12 +19,33 @@ cp -r ${CORE_DBT_PROJECT}/* "${DBT_WORKSPACE}/"
 # --- Enterprise Model Management ---
 if [ -n "${DBT_GIT_EXTERNAL_REPO}" ]; then
   echo "DBT_GIT_EXTERNAL_REPO is set. Enabling enterprise models ..."
+  
+  ENTERPRISE_REPO_DIR="/tmp/dbt/target"
+
+  if [ -z "${DBT_GIT_USER_NAME}" ] || [ -z "${DBT_ENV_SECRET_GIT_CREDENTIAL}" ]; then
+    echo "ERROR: Git credentials (DBT_GIT_USER_NAME or DBT_ENV_SECRET_GIT_CREDENTIAL) are not set or empty."
+    exit 1
+  fi
+
+  REPO_URL="https://${DBT_GIT_USER_NAME}:${DBT_ENV_SECRET_GIT_CREDENTIAL}@${DBT_GIT_EXTERNAL_REPO}"
+  
+  echo "Cloning enterprise repository..."
+  rm -rf "${ENTERPRISE_REPO_DIR}"
+  git clone -q "${REPO_URL}" "${ENTERPRISE_REPO_DIR}"
+  
+  if [ -n "${DBT_GIT_EXTERNAL_REPO_REVISION}" ]; then
+    echo "Checking out revision ${DBT_GIT_EXTERNAL_REPO_REVISION}..."
+    git -C "${ENTERPRISE_REPO_DIR}" checkout -q "${DBT_GIT_EXTERNAL_REPO_REVISION}"
+  fi
+
   echo "" >> "${DBT_WORKSPACE}/packages.yml"
-  # Append git dependency to workspace packages.yml using Jinja for env vars
-  cat <<EOF >> "${DBT_WORKSPACE}/packages.yml"
-  - git: "https://{{env_var('DBT_GIT_USER_NAME')}}:{{env_var('DBT_ENV_SECRET_GIT_CREDENTIAL')}}@{{env_var('DBT_GIT_EXTERNAL_REPO')}}"
-    revision: "{{env_var('DBT_GIT_EXTERNAL_REPO_REVISION')}}"
-EOF
+  
+  for d in "${ENTERPRISE_REPO_DIR}"/*/; do
+    if [ -d "$d" ]; then
+      DIR_PATH=$(echo "$d" | sed 's:/*$::')
+      echo "  - local: \"${DIR_PATH}\"" >> "${DBT_WORKSPACE}/packages.yml"
+    fi
+  done
 else
   echo "DBT_GIT_EXTERNAL_REPO is not set. Running in core-only mode."
 fi
