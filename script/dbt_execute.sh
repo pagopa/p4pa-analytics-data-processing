@@ -20,9 +20,12 @@ cp -r ${CORE_DBT_PROJECT}/* "${DBT_WORKSPACE}/"
 if [ -n "${DBT_GIT_EXTERNAL_REPO}" ]; then
   echo "DBT_GIT_EXTERNAL_REPO is set. Enabling enterprise models ..."
   
-  ENTERPRISE_REPO_DIR="/tmp/dbt/target"
+  # 1. Duplicazioni nel file packages.yaml
+  # 2. Fare check aggiornamento delle dipendenze senza riavviare il container
 
-  if [ -z "${DBT_GIT_USER_NAME}" ] || [ -z "${DBT_ENV_SECRET_GIT_CREDENTIAL}" ]; then
+  ENTERPRISE_REPO_DIR="/tmp/dbt/source"
+
+  if [ -z "${DBT_GIT_USER_NAME}" ] || [ -z "${DBT_ENV_SECRET_GIT_CREDENTIAL}" ]; then # TODO aggiungere check revision
     echo "ERROR: Git credentials (DBT_GIT_USER_NAME or DBT_ENV_SECRET_GIT_CREDENTIAL) are not set or empty."
     exit 1
   fi
@@ -30,13 +33,13 @@ if [ -n "${DBT_GIT_EXTERNAL_REPO}" ]; then
   REPO_URL="https://${DBT_GIT_USER_NAME}:${DBT_ENV_SECRET_GIT_CREDENTIAL}@${DBT_GIT_EXTERNAL_REPO}"
   
   echo "Cloning enterprise repository..."
-  rm -rf "${ENTERPRISE_REPO_DIR}"
-  git clone -q "${REPO_URL}" "${ENTERPRISE_REPO_DIR}"
-  
+  rm -rf "${ENTERPRISE_REPO_DIR}" # TODO Attenzione che elimina tutto il source, forse meglio con il nome del path
+  git clone -q "${REPO_URL}" "${ENTERPRISE_REPO_DIR}" # TODO aggiungere -b con revision e --depth 0 per tirarsi giù solo l'ultimo commit (fare check)
+  # TODO stampare a console il nome del branch e l'id del commit
   if [ -n "${DBT_GIT_EXTERNAL_REPO_REVISION}" ]; then
     echo "Checking out revision ${DBT_GIT_EXTERNAL_REPO_REVISION}..."
     git -C "${ENTERPRISE_REPO_DIR}" checkout -q "${DBT_GIT_EXTERNAL_REPO_REVISION}"
-  fi
+  fi # TODO rimuovere
 
   echo "" >> "${DBT_WORKSPACE}/packages.yml"
   
