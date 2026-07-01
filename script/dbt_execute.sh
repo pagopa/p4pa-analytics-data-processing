@@ -19,27 +19,19 @@ cp -r ${CORE_DBT_PROJECT}/* "${DBT_WORKSPACE}/"
 # --- Enterprise Model Management ---
 if [ -n "${DBT_GIT_EXTERNAL_REPO}" ]; then
   echo "DBT_GIT_EXTERNAL_REPO is set. Enabling enterprise models ..."
-  
-  # 1. Duplicazioni nel file packages.yaml
-  # 2. Fare check aggiornamento delle dipendenze senza riavviare il container
 
-  ENTERPRISE_REPO_DIR="/tmp/dbt/source"
-
-  if [ -z "${DBT_GIT_USER_NAME}" ] || [ -z "${DBT_ENV_SECRET_GIT_CREDENTIAL}" ]; then # TODO aggiungere check revision
-    echo "ERROR: Git credentials (DBT_GIT_USER_NAME or DBT_ENV_SECRET_GIT_CREDENTIAL) are not set or empty."
+  if [ -z "${DBT_GIT_USER_NAME}" ] || [ -z "${DBT_ENV_SECRET_GIT_CREDENTIAL}" ] || [ -z "${DBT_GIT_EXTERNAL_REPO_REVISION}" ]; then
+    echo "ERROR: Git credentials or revision (DBT_GIT_USER_NAME, DBT_ENV_SECRET_GIT_CREDENTIAL, DBT_GIT_EXTERNAL_REPO_REVISION) are not set or empty."
     exit 1
   fi
 
+  ENTERPRISE_REPO_DIR="${DBT_WORKSPACE}/$(basename "${DBT_GIT_EXTERNAL_REPO}" .git)"
   REPO_URL="https://${DBT_GIT_USER_NAME}:${DBT_ENV_SECRET_GIT_CREDENTIAL}@${DBT_GIT_EXTERNAL_REPO}"
-  
-  echo "Cloning enterprise repository..."
-  rm -rf "${ENTERPRISE_REPO_DIR}" # TODO Attenzione che elimina tutto il source, forse meglio con il nome del path
-  git clone -q "${REPO_URL}" "${ENTERPRISE_REPO_DIR}" # TODO aggiungere -b con revision e --depth 0 per tirarsi giù solo l'ultimo commit (fare check)
-  # TODO stampare a console il nome del branch e l'id del commit
-  if [ -n "${DBT_GIT_EXTERNAL_REPO_REVISION}" ]; then
-    echo "Checking out revision ${DBT_GIT_EXTERNAL_REPO_REVISION}..."
-    git -C "${ENTERPRISE_REPO_DIR}" checkout -q "${DBT_GIT_EXTERNAL_REPO_REVISION}"
-  fi # TODO rimuovere
+
+  echo "Cloning enterprise repository (revision: ${DBT_GIT_EXTERNAL_REPO_REVISION})..."
+  rm -rf "${ENTERPRISE_REPO_DIR}"
+  git clone -q -b "${DBT_GIT_EXTERNAL_REPO_REVISION}" "${REPO_URL}" "${ENTERPRISE_REPO_DIR}"
+  echo "Checked out branch $(git -C "${ENTERPRISE_REPO_DIR}" rev-parse --abbrev-ref HEAD), commit $(git -C "${ENTERPRISE_REPO_DIR}" rev-parse HEAD)"
 
   echo "" >> "${DBT_WORKSPACE}/packages.yml"
   
