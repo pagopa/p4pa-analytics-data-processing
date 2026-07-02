@@ -19,6 +19,7 @@ cp -r ${CORE_DBT_PROJECT}/* "${DBT_WORKSPACE}/"
 # --- Enterprise Model Management ---
 if [ -n "${DBT_GIT_EXTERNAL_REPO}" ]; then
   echo "DBT_GIT_EXTERNAL_REPO is set. Enabling enterprise models ..."
+  echo "Repository URL: https://${DBT_GIT_EXTERNAL_REPO}"
 
   if [ -z "${DBT_GIT_USER_NAME}" ] || [ -z "${DBT_ENV_SECRET_GIT_CREDENTIAL}" ] || [ -z "${DBT_GIT_EXTERNAL_REPO_REVISION}" ]; then
     echo "ERROR: Git credentials or revision (DBT_GIT_USER_NAME, DBT_ENV_SECRET_GIT_CREDENTIAL, DBT_GIT_EXTERNAL_REPO_REVISION) are not set or empty."
