@@ -4,8 +4,8 @@ import io.temporal.activity.ActivityInterface;
 import io.temporal.activity.ActivityMethod;
 
 @ActivityInterface
-public interface AssessmentsClassificationProcessingActivity {
+public interface AnalyticsDataProcessingActivity {
 
   @ActivityMethod
-  String executeAssessmentsClassificationProcessingActivity();
+  String executeAnalyticsDataProcessingActivity();
 }

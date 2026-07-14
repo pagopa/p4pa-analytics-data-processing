@@ -17,7 +17,7 @@ See [OpenAPI](openapi/generated.openapi.json), exposed through the following pat
 ### 📌 Relevant APIs
 * `GET /workflows/{workflowId}/status`: To get workflow status;
 * `GET /schedules/{scheduleId}/info`: To get schedule info;
-* `POST /workflow/assessments-classifications-process`: To start AssessmentsClassificationsProcess WF.
+* `POST /workflow/analytics-data-process`: To start AnalyticsDataProcess WF.
 
 ### 📌 Common HTTP status returned:
 * `200`: Successful operation;
@@ -106,9 +106,9 @@ See the following properties for poller sizes:
 * `spring.temporal.workers[*].capacity.activity-task-pollers-configuration.poller-behavior-autoscaling`
 
 #### 💼 Business logic
-| ENV                                               | DESCRIPTION                                                                  | DEFAULT    |
-|---------------------------------------------------|------------------------------------------------------------------------------|------------|
-| SCHEDULE_ASSESSMENTS_CLASSIFICATIONS_PROCESS_CRON | Frequency of AssessmentsClassifications data processing WF (cron expression) | 0 1 * * *  |
+| ENV                                  | DESCRIPTION                                                     | DEFAULT    |
+|--------------------------------------|-----------------------------------------------------------------|------------|
+| SCHEDULE_ANALYTICS_DATA_PROCESS_CRON | Frequency of AnalyticsData data processing WF (cron expression) | 0 1 * * *  |
 
 #### 🔑 keys
 | ENV                  | DESCRIPTION                                                                              | DEFAULT |

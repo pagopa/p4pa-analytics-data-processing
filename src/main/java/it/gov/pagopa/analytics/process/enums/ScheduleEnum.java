@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ScheduleEnum {
-  SCHEDULE_ASSESSMENTS_CLASSIFICATIONS_PROCESS_WF("AssessmentsClassificationsProcessSchedule");
+  SCHEDULE_ANALYTICS_DATA_PROCESS_WF("AnalyticsDataProcessSchedule");
 
   private final String value;
 }

@@ -62,12 +62,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDTO'
-  /workflow/assessments-classifications-process:
+  /workflow/analytics-data-process:
     post:
       tags:
-        - AssessmentsClassificationsProcess
-      operationId: processAssessmentsClassifications
-      description: To start AssessmentsClassifications process
+        - AnalyticsDataProcess
+      operationId: processAnalyticsData
+      description: To start AnalyticsData process
       responses:
         '201':
           description: "Workflow created successfully"

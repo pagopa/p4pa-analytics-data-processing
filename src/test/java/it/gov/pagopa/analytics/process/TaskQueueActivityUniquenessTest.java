@@ -4,7 +4,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import io.temporal.spring.boot.autoconfigure.template.WorkersTemplate;
 import it.gov.pagopa.analytics.process.utils.MemoryAppender;
-import it.gov.pagopa.analytics.process.wf.assessments.AssessmentsClassificationsProcessScheduler;
+import it.gov.pagopa.analytics.process.wf.assessments.AnalyticsDataProcessScheduler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ class TaskQueueActivityUniquenessTest {
 
   // disabling scheduling due to temporal test server not support
   @MockitoBean
-  private AssessmentsClassificationsProcessScheduler assessmentsClassificationsProcessSchedulerMock;
+  private AnalyticsDataProcessScheduler analyticsDataProcessSchedulerMock;
 
   @Autowired
   private WorkersTemplate workersTemplate;
