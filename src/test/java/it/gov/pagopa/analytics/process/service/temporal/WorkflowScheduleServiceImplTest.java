@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class WorkflowScheduleServiceImplTest {
 
-  public static final ScheduleEnum SCHEDULE_ID = ScheduleEnum.SCHEDULE_ASSESSMENTS_CLASSIFICATIONS_PROCESS_WF;
+  public static final ScheduleEnum SCHEDULE_ID = ScheduleEnum.SCHEDULE_ANALYTICS_DATA_PROCESS_WF;
 
   @Mock
   private ScheduleClient scheduleClientMock;

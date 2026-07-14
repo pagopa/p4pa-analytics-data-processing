@@ -13,7 +13,7 @@ import it.gov.pagopa.analytics.process.exception.custom.WorkflowInternalErrorExc
 import it.gov.pagopa.analytics.process.exception.custom.WorkflowNotFoundException;
 import it.gov.pagopa.analytics.process.mapper.WorkflowStatusDTOMapper;
 import it.gov.pagopa.analytics.process.utils.TaskQueueConstants;
-import it.gov.pagopa.analytics.process.wf.assessments.wf.AssessmentsClassificationsProcessWF;
+import it.gov.pagopa.analytics.process.wf.assessments.wf.AnalyticsDataProcessWF;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +36,7 @@ class WorkflowServiceTest {
   @Mock
   private WorkflowStatusDTOMapper mapperMock;
   @Mock
-  private AssessmentsClassificationsProcessWF wfMock;
+  private AnalyticsDataProcessWF wfMock;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private WorkflowExecutionInfo workflowExecutionInfoMock;
   @Mock
@@ -63,7 +63,7 @@ class WorkflowServiceTest {
 
     String taskQueue = TaskQueueConstants.TASK_QUEUE_DATA_PROCESSING;
     when(workflowClientMock.newWorkflowStub(
-      Mockito.eq(AssessmentsClassificationsProcessWF.class),
+      Mockito.eq(AnalyticsDataProcessWF.class),
       Mockito.<WorkflowOptions>argThat(options ->
         taskQueue.equals(options.getTaskQueue()) &&
           workflowId.equals(options.getWorkflowId())
@@ -71,7 +71,7 @@ class WorkflowServiceTest {
       .thenReturn(wfMock);
 
     // When
-    AssessmentsClassificationsProcessWF result = workflowService.buildWorkflowStubToStartNew(AssessmentsClassificationsProcessWF.class, taskQueue, workflowId);
+    AnalyticsDataProcessWF result = workflowService.buildWorkflowStubToStartNew(AnalyticsDataProcessWF.class, taskQueue, workflowId);
 
     // Then
     Assertions.assertSame(wfMock, result);
@@ -85,14 +85,14 @@ class WorkflowServiceTest {
     Optional<String> runId = Optional.empty();
 
     when(workflowClientMock.newWorkflowStub(
-      Mockito.eq(AssessmentsClassificationsProcessWF.class),
+      Mockito.eq(AnalyticsDataProcessWF.class),
       Mockito.same(workflowId),
       Mockito.same(runId)
     ))
       .thenReturn(wfMock);
 
     // When
-    AssessmentsClassificationsProcessWF result = workflowService.buildWorkflowStub(AssessmentsClassificationsProcessWF.class, workflowId, runId);
+    AnalyticsDataProcessWF result = workflowService.buildWorkflowStub(AnalyticsDataProcessWF.class, workflowId, runId);
 
     // Then
     Assertions.assertSame(wfMock, result);
@@ -200,12 +200,12 @@ class WorkflowServiceTest {
 
     Duration duration = Duration.ofDays(1);
     when(workflowClientMock.newWorkflowStub(
-      Mockito.eq(AssessmentsClassificationsProcessWF.class),
+      Mockito.eq(AnalyticsDataProcessWF.class),
       Mockito.<WorkflowOptions>argThat(options -> taskQueue.equals(options.getTaskQueue()) &&
         workflowId.equals(options.getWorkflowId()) && duration.equals(options.getStartDelay()))
     )).thenReturn(wfMock);
 
-    AssessmentsClassificationsProcessWF result = workflowService.buildWorkflowStubDelayed(AssessmentsClassificationsProcessWF.class,
+    AnalyticsDataProcessWF result = workflowService.buildWorkflowStubDelayed(AnalyticsDataProcessWF.class,
       taskQueue,
       workflowId,
       duration);
@@ -220,12 +220,12 @@ class WorkflowServiceTest {
 
     Duration expectedDuration = Duration.ZERO;
     when(workflowClientMock.newWorkflowStub(
-      Mockito.eq(AssessmentsClassificationsProcessWF.class),
+      Mockito.eq(AnalyticsDataProcessWF.class),
       Mockito.<WorkflowOptions>argThat(options -> taskQueue.equals(options.getTaskQueue()) &&
         workflowId.equals(options.getWorkflowId()) && expectedDuration.equals(options.getStartDelay()))
     )).thenReturn(wfMock);
 
-    AssessmentsClassificationsProcessWF result = workflowService.buildWorkflowStubDelayed(AssessmentsClassificationsProcessWF.class,
+    AnalyticsDataProcessWF result = workflowService.buildWorkflowStubDelayed(AnalyticsDataProcessWF.class,
       taskQueue,
       workflowId,
       Duration.between(LocalDateTime.now(), LocalDateTime.now().minusDays(1)));
@@ -241,17 +241,17 @@ class WorkflowServiceTest {
     LocalDate localDate = LocalDate.now().plusDays(1);
 
 
-    AssessmentsClassificationsProcessWF expectedResult = mock(AssessmentsClassificationsProcessWF.class);
+    AnalyticsDataProcessWF expectedResult = mock(AnalyticsDataProcessWF.class);
     doReturn(expectedResult)
       .when(workflowService)
       .buildWorkflowStubScheduled(
-        AssessmentsClassificationsProcessWF.class,
+        AnalyticsDataProcessWF.class,
         taskQueue,
         workflowId,
         LocalDateTime.of(localDate, LocalTime.MIDNIGHT)
       );
 
-    AssessmentsClassificationsProcessWF result = workflowService.buildWorkflowStubScheduled(AssessmentsClassificationsProcessWF.class,
+    AnalyticsDataProcessWF result = workflowService.buildWorkflowStubScheduled(AnalyticsDataProcessWF.class,
       taskQueue, workflowId, localDate);
 
     Assertions.assertSame(expectedResult, result);
@@ -266,7 +266,7 @@ class WorkflowServiceTest {
     LocalDateTime nextSchedule = LocalDateTime.now().plusDays(1);
     Duration expectedMaxDuration = Duration.ofDays(1);
 
-    workflowService.buildWorkflowStubScheduled(AssessmentsClassificationsProcessWF.class,
+    workflowService.buildWorkflowStubScheduled(AnalyticsDataProcessWF.class,
       taskQueue,
       workflowId,
       nextSchedule);
@@ -274,7 +274,7 @@ class WorkflowServiceTest {
     ArgumentCaptor<WorkflowOptions> optionsCaptor = ArgumentCaptor.forClass(WorkflowOptions.class);
 
     verify(workflowClientMock).newWorkflowStub(
-      eq(AssessmentsClassificationsProcessWF.class),
+      eq(AnalyticsDataProcessWF.class),
       optionsCaptor.capture()
     );
 
@@ -296,7 +296,7 @@ class WorkflowServiceTest {
     Duration expectedMaxDuration = Duration.ofDays(1);
     OffsetDateTime nextSchedule = OffsetDateTime.now(ZoneOffset.MAX).plus(expectedMaxDuration);
 
-    workflowService.buildWorkflowStubScheduled(AssessmentsClassificationsProcessWF.class,
+    workflowService.buildWorkflowStubScheduled(AnalyticsDataProcessWF.class,
       taskQueue,
       workflowId,
       nextSchedule);
@@ -304,7 +304,7 @@ class WorkflowServiceTest {
     ArgumentCaptor<WorkflowOptions> optionsCaptor = ArgumentCaptor.forClass(WorkflowOptions.class);
 
     verify(workflowClientMock).newWorkflowStub(
-      eq(AssessmentsClassificationsProcessWF.class),
+      eq(AnalyticsDataProcessWF.class),
       optionsCaptor.capture()
     );
 

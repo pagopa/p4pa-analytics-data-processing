@@ -13,8 +13,8 @@
     "BearerAuth" : [ ]
   } ],
   "tags" : [ {
-    "name" : "AssessmentsClassificationsProcess",
-    "description" : "the AssessmentsClassificationsProcess API"
+    "name" : "AnalyticsDataProcess",
+    "description" : "the AnalyticsDataProcess API"
   }, {
     "name" : "Schedule",
     "description" : "the Schedule API"
@@ -23,11 +23,11 @@
     "description" : "the Workflow API"
   } ],
   "paths" : {
-    "/workflow/assessments-classifications-process" : {
+    "/workflow/analytics-data-process" : {
       "post" : {
-        "tags" : [ "AssessmentsClassificationsProcess" ],
-        "description" : "To start AssessmentsClassifications process",
-        "operationId" : "processAssessmentsClassifications",
+        "tags" : [ "AnalyticsDataProcess" ],
+        "description" : "To start AnalyticsData process",
+        "operationId" : "processAnalyticsData",
         "responses" : {
           "201" : {
             "description" : "Workflow created successfully",
@@ -253,7 +253,7 @@
       },
       "ScheduleEnum" : {
         "type" : "string",
-        "enum" : [ "SCHEDULE_ASSESSMENTS_CLASSIFICATIONS_PROCESS_WF" ]
+        "enum" : [ "SCHEDULE_ANALYTICS_DATA_PROCESS_WF" ]
       },
       "ScheduleExecutionInfoDTO" : {
         "required" : [ "runId", "workflowId" ],

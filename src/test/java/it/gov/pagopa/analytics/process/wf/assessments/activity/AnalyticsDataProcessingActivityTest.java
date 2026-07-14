@@ -12,16 +12,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class AssessmentsClassificationProcessingActivityTest {
+class AnalyticsDataProcessingActivityTest {
 
   @Mock
   private CommandExecutor commandExecutor;
 
-  private AssessmentsClassificationProcessingActivity activity;
+  private AnalyticsDataProcessingActivity activity;
 
   @BeforeEach
   void init() {
-    activity = new AssessmentsClassificationProcessingActivityImpl(commandExecutor);
+    activity = new AnalyticsDataProcessingActivityImpl(commandExecutor);
   }
 
   @Test
@@ -31,11 +31,11 @@ class AssessmentsClassificationProcessingActivityTest {
       .thenReturn(mockExitStatus);
 
     // When
-    activity.executeAssessmentsClassificationProcessingActivity();
+    activity.executeAnalyticsDataProcessingActivity();
 
     // Then
     assertDoesNotThrow(() -> {
-      activity.executeAssessmentsClassificationProcessingActivity();
+      activity.executeAnalyticsDataProcessingActivity();
     });
   }
 }

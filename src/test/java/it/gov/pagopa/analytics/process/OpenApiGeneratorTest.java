@@ -2,7 +2,7 @@ package it.gov.pagopa.analytics.process;
 
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.schedules.ScheduleClient;
-import it.gov.pagopa.analytics.process.wf.assessments.AssessmentsClassificationsProcessScheduler;
+import it.gov.pagopa.analytics.process.wf.assessments.AnalyticsDataProcessScheduler;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ class OpenApiGeneratorTest {
 
   // Suppressing Temporal scheduling
   @MockitoBean
-  private AssessmentsClassificationsProcessScheduler assessmentsClassificationsProcessSchedulerMock;
+  private AnalyticsDataProcessScheduler analyticsDataProcessSchedulerMock;
 
   @Test
   void generateAndVerifyCommit() throws Exception {

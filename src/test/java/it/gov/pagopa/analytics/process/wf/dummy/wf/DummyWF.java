@@ -6,7 +6,7 @@ import io.temporal.workflow.WorkflowMethod;
 
 
 /**
- * Workflow to build DataMart AssessmentsClassifications
+ * Workflow to build DataMart AnalyticsData
  */
 @WorkflowInterface
 public interface DummyWF {

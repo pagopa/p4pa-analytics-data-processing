@@ -6,11 +6,11 @@ import io.temporal.workflow.WorkflowMethod;
 
 
 /**
- * Workflow to build DataMart AssessmentsClassifications
+ * Workflow to build DataMart AnalyticsData
  */
 @WorkflowInterface
-public interface AssessmentsClassificationsProcessWF {
+public interface AnalyticsDataProcessWF {
   @WorkflowMethod
-  String processAssessmentsClassifications();
+  String processAnalyticsData();
 }
 

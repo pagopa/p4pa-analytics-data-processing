@@ -31,7 +31,7 @@ class ScheduleInfoDTOMapperTest {
     Instant startedAt2 = Instant.now().plusSeconds(100);
     Instant nextSchedule = Instant.now().plusSeconds(1000);
 
-    ScheduleEnum scheduleId = ScheduleEnum.SCHEDULE_ASSESSMENTS_CLASSIFICATIONS_PROCESS_WF;
+    ScheduleEnum scheduleId = ScheduleEnum.SCHEDULE_ANALYTICS_DATA_PROCESS_WF;
     ScheduleInfo scheduleInfo = new ScheduleInfo(
       1L,
       2L,

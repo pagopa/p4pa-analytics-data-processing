@@ -32,7 +32,7 @@ class ScheduleControllerTest {
 
   @Test
   void whenGetScheduleInfoThenOk() throws Exception {
-    ScheduleEnum scheduleId = ScheduleEnum.SCHEDULE_ASSESSMENTS_CLASSIFICATIONS_PROCESS_WF;
+    ScheduleEnum scheduleId = ScheduleEnum.SCHEDULE_ANALYTICS_DATA_PROCESS_WF;
     ScheduleInfoDTO expectedResult = ScheduleInfoDTO.builder()
       .scheduleId(scheduleId)
       .build();
