@@ -5,8 +5,8 @@ import it.gov.pagopa.analytics.process.service.temporal.WorkflowClientService;
 import it.gov.pagopa.analytics.process.service.temporal.WorkflowService;
 import it.gov.pagopa.analytics.process.utils.TaskQueueConstants;
 import it.gov.pagopa.analytics.process.utils.TemporalTestUtils;
-import it.gov.pagopa.analytics.process.wf.assessments.wf.AssessmentsClassificationsProcessWF;
-import it.gov.pagopa.analytics.process.wf.assessments.wf.AssessmentsClassificationsProcessWFImpl;
+import it.gov.pagopa.analytics.process.wf.assessments.wf.AnalyticsDataProcessWF;
+import it.gov.pagopa.analytics.process.wf.assessments.wf.AnalyticsDataProcessWFImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,20 +17,20 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class AssessmentsClassificationsProcessWFClientTest {
+class AnalyticsDataProcessWFClientTest {
 
   @Mock
   private WorkflowService workflowServiceMock;
   @Mock
   private WorkflowClientService workflowClientServiceMock;
   @Mock
-  private AssessmentsClassificationsProcessWF wfMock;
+  private AnalyticsDataProcessWF wfMock;
 
-  private AssessmentsClassificationsProcessWFClient client;
+  private AnalyticsDataProcessWFClient client;
 
   @BeforeEach
   void init() {
-    client = new AssessmentsClassificationsProcessWFClient(workflowServiceMock, workflowClientServiceMock);
+    client = new AnalyticsDataProcessWFClient(workflowServiceMock, workflowClientServiceMock);
   }
 
   @AfterEach
@@ -39,23 +39,23 @@ class AssessmentsClassificationsProcessWFClientTest {
   }
 
   @Test
-  void whenProcessAssessmentsClassificationsThenOk() {
+  void whenProcessAnalyticsDataThenOk() {
     // Given
     String taskQueue = TaskQueueConstants.TASK_QUEUE_DATA_PROCESSING;
-    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("AssessmentsClassificationsProcessWF-ON-DEMAND", "RUNID");
+    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("AnalyticsDataProcessWF-ON-DEMAND", "RUNID");
 
-    Mockito.when(workflowServiceMock.buildWorkflowStubToStartNew(AssessmentsClassificationsProcessWF.class, taskQueue, expectedResult.getWorkflowId()))
+    Mockito.when(workflowServiceMock.buildWorkflowStubToStartNew(AnalyticsDataProcessWF.class, taskQueue, expectedResult.getWorkflowId()))
       .thenReturn(wfMock);
 
     TemporalTestUtils.configureWorkflowClientServiceMock(workflowClientServiceMock, expectedResult);
 
     // When
-    WorkflowCreatedDTO result = client.processAssessmentsClassifications();
+    WorkflowCreatedDTO result = client.processAnalyticsData();
 
     // Then
     Assertions.assertEquals(expectedResult, result);
-    Mockito.verify(wfMock).processAssessmentsClassifications();
+    Mockito.verify(wfMock).processAnalyticsData();
 
-    TemporalTestUtils.verifyWorkflowTaskQueueConfiguration(taskQueue, AssessmentsClassificationsProcessWFImpl.class);
+    TemporalTestUtils.verifyWorkflowTaskQueueConfiguration(taskQueue, AnalyticsDataProcessWFImpl.class);
   }
 }

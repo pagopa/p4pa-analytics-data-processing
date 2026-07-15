@@ -1,7 +1,7 @@
 package it.gov.pagopa.analytics.process.controller.wf;
 
 import it.gov.pagopa.analytics.process.dto.generated.WorkflowCreatedDTO;
-import it.gov.pagopa.analytics.process.wf.assessments.AssessmentsClassificationsProcessWFClient;
+import it.gov.pagopa.analytics.process.wf.assessments.AnalyticsDataProcessWFClient;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AssessmentsClassificationsProcessControllerImpl.class)
+@WebMvcTest(AnalyticsDataProcessControllerImpl.class)
 @AutoConfigureMockMvc(addFilters = false)
-class AssessmentsClassificationsProcessControllerTest {
+class AnalyticsDataProcessControllerTest {
   @Autowired
   private MockMvc mockMvc;
 
@@ -28,10 +28,10 @@ class AssessmentsClassificationsProcessControllerTest {
   private JsonMapper jsonMapper;
 
   @MockitoBean
-  private AssessmentsClassificationsProcessWFClient wfClientMock;
+  private AnalyticsDataProcessWFClient wfClientMock;
 
   @Test
-  void whenProcessAssessmentsClassificationsThenOk() throws Exception {
+  void whenProcessAnalyticsDataThenOk() throws Exception {
     String workflowId = "workflow-1";
     String runId = "runId";
     WorkflowCreatedDTO expected = WorkflowCreatedDTO.builder()
@@ -39,11 +39,11 @@ class AssessmentsClassificationsProcessControllerTest {
       .runId(runId)
       .build();
 
-    Mockito.when(wfClientMock.processAssessmentsClassifications())
+    Mockito.when(wfClientMock.processAnalyticsData())
       .thenReturn(expected);
 
     MvcResult result = mockMvc.perform(
-        post("/workflow/assessments-classifications-process"))
+        post("/workflow/analytics-data-process"))
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
       .andReturn();

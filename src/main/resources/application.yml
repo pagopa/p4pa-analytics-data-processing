@@ -117,8 +117,8 @@ rest:
       read-millis: "\${DEFAULT_REST_TIMEOUT_READ_MILLIS:120000}"
 
 schedule:
-  assessments-classifications-process:
-    cron-expression: "\${SCHEDULE_ASSESSMENTS_CLASSIFICATIONS_PROCESS_CRON:0 1/6 * * *}" # each day, 01:00-07:00-13:00-19:00 (Europe/Rome)
+  analytics-data-process:
+    cron-expression: "\${SCHEDULE_ANALYTICS_DATA_PROCESS_CRON:0 1/6 * * *}" # each day, 01:00-07:00-13:00-19:00 (Europe/Rome)
 
 temporal:
   timeouts:
@@ -135,8 +135,8 @@ workflow:
     retryMaximumAttempts: "\${DEFAULT_ACTIVITY_CONFIG_RETRY_MAXIMUM_ATTEMPTS:30}"
 
   # data processing
-  assessments-classification-process:
-    start-to-close-timeout-in-seconds: "\${ASSESSMENTS_CLASSIFICATIONS_ACTIVITY_CONFIG_START_TO_CLOSE_TIMEOUT_IN_SECONDS:\${workflow.default.startToCloseTimeoutInSeconds}}"
-    retry-initial-interval-in-millis: "\${ASSESSMENTS_CLASSIFICATIONS_ACTIVITY_CONFIG_RETRY_INITIAL_INTERVAL_IN_MILLIS:\${workflow.default.retryInitialIntervalInMillis}}"
-    retry-backoff-coefficient: "\${ASSESSMENTS_CLASSIFICATIONS_ACTIVITY_CONFIG_RETRY_BACKOFF_COEFFICIENT:\${workflow.default.retryBackoffCoefficient}}"
-    retry-maximum-attempts: "\${ASSESSMENTS_CLASSIFICATIONS_ACTIVITY_CONFIG_RETRY_MAXIMUM_ATTEMPTS:\${workflow.default.retryMaximumAttempts}}"
+  analytics-data-process:
+    start-to-close-timeout-in-seconds: "\${ANALYTICS_DATA_ACTIVITY_CONFIG_START_TO_CLOSE_TIMEOUT_IN_SECONDS:\${workflow.default.startToCloseTimeoutInSeconds}}"
+    retry-initial-interval-in-millis: "\${ANALYTICS_DATA_ACTIVITY_CONFIG_RETRY_INITIAL_INTERVAL_IN_MILLIS:\${workflow.default.retryInitialIntervalInMillis}}"
+    retry-backoff-coefficient: "\${ANALYTICS_DATA_ACTIVITY_CONFIG_RETRY_BACKOFF_COEFFICIENT:\${workflow.default.retryBackoffCoefficient}}"
+    retry-maximum-attempts: "\${ANALYTICS_DATA_ACTIVITY_CONFIG_RETRY_MAXIMUM_ATTEMPTS:\${workflow.default.retryMaximumAttempts}}"

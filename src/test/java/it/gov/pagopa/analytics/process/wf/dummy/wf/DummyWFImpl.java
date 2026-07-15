@@ -34,9 +34,9 @@ public class DummyWFImpl implements DummyWF, ApplicationContextAware {
 
   @Override
   public String process() {
-    log.info("Executing AssessmentsClassifications DataMart process");
+    log.info("Executing AnalyticsData DataMart process");
     String result = dummyActivity.executeDummyActivity();
-    log.info("AssessmentsClassifications process completed: {}", result);
+    log.info("AnalyticsData process completed: {}", result);
     return result;
   }
 }

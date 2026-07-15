@@ -8,7 +8,7 @@ import io.temporal.client.WorkflowClient;
 import io.temporal.internal.client.WorkflowClientHelper;
 import it.gov.pagopa.analytics.process.dto.generated.WorkflowCreatedDTO;
 import it.gov.pagopa.analytics.process.exception.NotRetryableActivityException;
-import it.gov.pagopa.analytics.process.wf.assessments.AssessmentsClassificationsProcessScheduler;
+import it.gov.pagopa.analytics.process.wf.assessments.AnalyticsDataProcessScheduler;
 import it.gov.pagopa.analytics.process.wf.dummy.DummyWFClient;
 import it.gov.pagopa.analytics.process.wf.dummy.activity.DummyActivity;
 import it.gov.pagopa.analytics.process.wf.dummy.service.DummyService;
@@ -53,7 +53,7 @@ class TemporalSpringBootIntegrationTest {
 
   // disabling scheduling due to temporal test server not support
   @MockitoBean
-  private AssessmentsClassificationsProcessScheduler assessmentsClassificationsProcessSchedulerMock;
+  private AnalyticsDataProcessScheduler analyticsDataProcessSchedulerMock;
 
 
   @MockitoSpyBean

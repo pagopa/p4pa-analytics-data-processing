@@ -9,17 +9,17 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @ActivityImpl(taskQueues = TaskQueueConstants.TASK_QUEUE_DATA_PROCESSING)
-public class AssessmentsClassificationProcessingActivityImpl implements AssessmentsClassificationProcessingActivity {
+public class AnalyticsDataProcessingActivityImpl implements AnalyticsDataProcessingActivity {
 
   private final CommandExecutor commandExecutor;
 
-  public AssessmentsClassificationProcessingActivityImpl(CommandExecutor commandExecutor) {
+  public AnalyticsDataProcessingActivityImpl(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
   }
 
   @Override
-  public String executeAssessmentsClassificationProcessingActivity() {
-    log.info("Executing AssessmentsClassificationProcessing activity");
+  public String executeAnalyticsDataProcessingActivity() {
+    log.info("Executing AnalyticsDataProcessing activity");
     String[] dbtCommand = new String[]{"/app/script/dbt_execute.sh"};
     return "Command executed with exitStatus:" + commandExecutor.executeCommandActivity(dbtCommand);
   }

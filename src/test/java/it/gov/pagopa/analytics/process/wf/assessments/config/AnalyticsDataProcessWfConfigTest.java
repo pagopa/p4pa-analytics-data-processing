@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-class AssessmentsClassificationsProcessWfConfigTest {
+class AnalyticsDataProcessWfConfigTest {
 
-  private final AssessmentsClassificationsProcessWfConfig config = new AssessmentsClassificationsProcessWfConfig();
+  private final AnalyticsDataProcessWfConfig config = new AnalyticsDataProcessWfConfig();
 
   private final Map<Class<?>, Class<?>> localActivityInterface2Impl = Map.of();
 

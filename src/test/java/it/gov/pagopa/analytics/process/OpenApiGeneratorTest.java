@@ -2,7 +2,7 @@ package it.gov.pagopa.analytics.process;
 
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.schedules.ScheduleClient;
-import it.gov.pagopa.analytics.process.wf.assessments.AssessmentsClassificationsProcessScheduler;
+import it.gov.pagopa.analytics.process.wf.assessments.AnalyticsDataProcessScheduler;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ class OpenApiGeneratorTest {
 
   // Suppressing Temporal scheduling
   @MockitoBean
-  private AssessmentsClassificationsProcessScheduler assessmentsClassificationsProcessSchedulerMock;
+  private AnalyticsDataProcessScheduler analyticsDataProcessSchedulerMock;
 
   @Test
   void generateAndVerifyCommit() throws Exception {
@@ -65,13 +65,14 @@ class OpenApiGeneratorTest {
 
     Path openApiGeneratedPath = Path.of("openapi/generated.openapi.json");
     boolean toStore=true;
+    String observedChanges = "";
     if(Files.exists(openApiGeneratedPath)){
       String storedOpenApi = Files.readString(openApiGeneratedPath);
       try {
         JsonAssert.comparator(JsonCompareMode.STRICT).assertIsMatch(storedOpenApi, openApiResult);
         toStore=false;
       } catch (Throwable e){
-        log.info("Observed the following changes: {}", e.getMessage());
+        observedChanges = "\nObserved the following changes: " + e.getMessage();
       }
     }
     if(toStore){
@@ -79,7 +80,7 @@ class OpenApiGeneratorTest {
     }
 
     String gitStatus = execCmd("git", "status");
-    Assertions.assertFalse(gitStatus.contains("openapi/generated.openapi.json"), "Generated OpenApi not committed");
+    Assertions.assertFalse(gitStatus.contains("openapi/generated.openapi.json"), "Generated OpenApi not committed" + observedChanges);
   }
 
   public static String execCmd(String... cmd) throws java.io.IOException {
