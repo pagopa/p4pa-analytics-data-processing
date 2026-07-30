@@ -13,6 +13,21 @@ with base as (
         md5(coalesce(office_description, '')) as hash_checksum,
         processed_time
     from {{ ref('payment_assessment_detail') }}
+
+    {% if is_incremental() %}
+        where processed_time >= (select coalesce(max(processed_time), '1900-01-01') from {{ this }} )
+    {% endif %}
+),
+
+-- keep only the most recent description per key within the batch
+ranked as (
+    select
+        b.*,
+        row_number() over (
+            partition by office_code, debt_position_type_org_id, operating_year
+            order by processed_time desc
+        ) as rn
+    from base as b
 ),
 
 source as (
@@ -23,11 +38,8 @@ source as (
     operating_year,
     office_description,
     hash_checksum
-    from base as b
-
-    {% if is_incremental() %}
-        where b.processed_time >= (select coalesce(max(processed_time), '1900-01-01') from {{ this }} )
-    {% endif %}
+    from ranked
+    where rn = 1
 ),
 
 new_data as (
