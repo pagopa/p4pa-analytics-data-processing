@@ -148,7 +148,7 @@ RUN apk upgrade --no-cache && \
     python3 -m venv .venv && \
     source .venv/bin/activate && \
     python -m ensurepip --upgrade && \
-    python -m pip install dbt-core dbt-postgres && \
+    python -m pip install "dbt-core==1.11.8" dbt-postgres && \
     dbt --version && \
     echo source .venv/bin/activate >> /etc/profile && \
     echo PATH="$PATH" >> /etc/profile && \
