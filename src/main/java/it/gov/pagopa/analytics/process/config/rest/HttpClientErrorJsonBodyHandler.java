@@ -1,9 +1,7 @@
 package it.gov.pagopa.analytics.process.config.rest;
 
-import it.gov.pagopa.analytics.process.exception.common.RestInvokeConflictException;
-import it.gov.pagopa.analytics.process.exception.common.RestInvokeForbiddenException;
-import it.gov.pagopa.analytics.process.exception.common.RestInvokeInvalidValueException;
-import it.gov.pagopa.analytics.process.exception.common.RestInvokeNotAuthorizedException;
+import it.gov.pagopa.analytics.process.dto.generated.ErrorFieldDTO;
+import it.gov.pagopa.analytics.process.exception.common.*;
 import it.gov.pagopa.analytics.process.utils.SecurityUtils;
 import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +17,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -35,11 +34,9 @@ public class HttpClientErrorJsonBodyHandler<T> extends DefaultResponseErrorHandl
 
   /**
    * Skipped Http client errors:
-   * <li>404 is normally catch in order to transcode it as null
    * <li>429 is handled by openApiGenerator code in order to retry it
    */
   private final Set<HttpStatusCode> ignoredClientErrors = Set.of(
-    HttpStatus.NOT_FOUND,
     HttpStatus.TOO_MANY_REQUESTS
   );
 
@@ -87,7 +84,10 @@ public class HttpClientErrorJsonBodyHandler<T> extends DefaultResponseErrorHandl
     } catch (HttpStatusCodeException ex) {
       if (statusCode.is4xxClientError() && !ignoredClientErrors.contains(statusCode)) {
         try {
-          T errorDTO = jsonMapper.readValue(ex.getResponseBodyAsString(), errorDtoClass);
+          T errorDTO = null;
+          if(ex.getResponseBodyAsByteArray().length > 0) {
+            errorDTO = jsonMapper.readValue(ex.getResponseBodyAsString(), errorDtoClass);
+          }
           throw errorTranscoder.apply(ex, errorDTO);
         } catch (JacksonException jacksonException) {
           log.info("Cannot deserialize error response from request {} {} - {}",
@@ -120,17 +120,29 @@ public class HttpClientErrorJsonBodyHandler<T> extends DefaultResponseErrorHandl
     Function<T, PuErrorDTO> errorDtoNormalizer
   ) {
     return (exception, errorDTO) -> {
-      PuErrorDTO puErrorDTO = errorDtoNormalizer.apply(errorDTO);
+      String code = applicationName + "_" + ((HttpStatus) exception.getStatusCode()).name();
+      String category = null;
+      String message = exception.getMessage();
+      List<ErrorFieldDTO> fields = null;
 
-      String code = Objects.requireNonNullElseGet(
-        puErrorDTO.code(),
-        () -> applicationName + "_" + ((HttpStatus) exception.getStatusCode()).name());
+      if(errorDTO != null) {
+        PuErrorDTO puErrorDTO = errorDtoNormalizer.apply(errorDTO);
+
+        code = Objects.requireNonNullElse(
+          puErrorDTO.code(),
+          code);
+
+        category = puErrorDTO.category();
+        message = puErrorDTO.message();
+        fields = puErrorDTO.fields();
+      }
 
       return switch (exception.getStatusCode()) {
-        case HttpStatus.CONFLICT -> new RestInvokeConflictException(applicationName, puErrorDTO.category(), code, puErrorDTO.message(), puErrorDTO.fields());
-        case HttpStatus.FORBIDDEN -> new RestInvokeForbiddenException(applicationName, puErrorDTO.category(), code, puErrorDTO.message());
-        case HttpStatus.UNAUTHORIZED -> new RestInvokeNotAuthorizedException(applicationName, puErrorDTO.category(), code, puErrorDTO.message());
-        default -> new RestInvokeInvalidValueException(applicationName, puErrorDTO.category(), code, puErrorDTO.message(), puErrorDTO.fields());
+        case HttpStatus.CONFLICT -> new RestInvokeConflictException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message, fields);
+        case HttpStatus.FORBIDDEN -> new RestInvokeForbiddenException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message);
+        case HttpStatus.UNAUTHORIZED -> new RestInvokeNotAuthorizedException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message);
+        case HttpStatus.NOT_FOUND -> new RestInvokeNotFoundException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message);
+        default -> new RestInvokeInvalidValueException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message, fields);
       };
     };
   }
