@@ -4,8 +4,8 @@
 # 🎯 Version Management
 #
 ARG IMAGE="public.ecr.aws/docker/library/eclipse-temurin"
-ARG IMAGE_VERSION="21-alpine-3.24"
-ARG IMAGE_SHA="6ea5548706b60ac0a602eaf48af74792cbab012d90e811ca8db6184b16b5c3d6"
+ARG IMAGE_VERSION="21-alpine-3.23"
+ARG IMAGE_SHA="bcc6da0b0efc6fb0e445173784dddb45d5f70afa8a9128430a63f79ef0154601"
 ARG GRADLE_VERSION="8.14.3"
 ARG GRADLE_DOWNLOAD_SHA256="bd71102213493060956ec229d946beee57158dbd89d0e62b91bca0fa2c5f3531"
 ARG APPINSIGHTS_VERSION="3.7.9"
@@ -148,7 +148,7 @@ RUN apk upgrade --no-cache && \
     python3 -m venv .venv && \
     source .venv/bin/activate && \
     python -m ensurepip --upgrade && \
-    python -m pip install "dbt-core==1.11.8" dbt-postgres && \
+    python -m pip install "dbt-core==1.11.14" "dbt-postgres==1.11.0" && \
     dbt --version && \
     echo source .venv/bin/activate >> /etc/profile && \
     echo PATH="$PATH" >> /etc/profile && \
