@@ -1,9 +1,9 @@
 package it.gov.pagopa.analytics.process.controller.wf;
 
+import io.micrometer.tracing.Tracer;
 import it.gov.pagopa.analytics.process.dto.generated.WorkflowCreatedDTO;
 import it.gov.pagopa.analytics.process.wf.assessments.AnalyticsDataProcessWFClient;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import tools.jackson.databind.json.JsonMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,6 +30,8 @@ class AnalyticsDataProcessControllerTest {
 
   @MockitoBean
   private AnalyticsDataProcessWFClient wfClientMock;
+  @MockitoBean
+  private Tracer tracerMock;
 
   @Test
   void whenProcessAnalyticsDataThenOk() throws Exception {
@@ -39,7 +42,7 @@ class AnalyticsDataProcessControllerTest {
       .runId(runId)
       .build();
 
-    Mockito.when(wfClientMock.processAnalyticsData())
+    when(wfClientMock.processAnalyticsData())
       .thenReturn(expected);
 
     MvcResult result = mockMvc.perform(

@@ -18,6 +18,44 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 public class UtilitiesTest {
 
+  public static void setTraceId(String traceId) {
+    setTraceId(traceId, null);
+  }
+  public static void setTraceId(String traceId, String spanId) {
+    MDC.put("traceId", traceId);
+    MDC.put("spanId", spanId);
+  }
+  public static void clearTraceIdContext(){
+    MDC.clear();
+  }
+
+  @Test
+  void testGetTraceId(){
+    // Given
+    String expectedResult = "TRACEID";
+    setTraceId(expectedResult);
+
+    // When
+    String result = Utilities.getTraceId();
+
+    // Then
+    Assertions.assertSame(expectedResult, result);
+    clearTraceIdContext();
+  }
+
+  @Test
+  void testGetSpanId(){
+    // Given
+    String expectedResult = "SPANID";
+    setTraceId("TRACEID", expectedResult);
+
+    // When
+    String result = Utilities.getSpanId();
+
+    // Then
+    Assertions.assertSame(expectedResult, result);
+    clearTraceIdContext();
+  }
   @Test
   void whenGenerateWorkflowIdThenOk(){
     String workflowId = Utilities.generateWorkflowId(1L, Utilities.class);
@@ -84,7 +122,7 @@ public class UtilitiesTest {
 
   @Test
   void givenOffsetDateTimeToInstantThenSuccess(){
-    OffsetDateTime offsetDateTime = OffsetDateTime.of(2025, 1, 9, 10, 30, 0, 0, ZoneOffset.UTC);
+    OffsetDateTime offsetDateTime = OffsetDateTime.of(2025, Month.JANUARY.getValue(), 9, 10, 30, 0, 0, ZoneOffset.UTC);
     Instant expectedInstant = Instant.parse("2025-01-09T10:30:00Z");
 
     Instant result = Utilities.offsetDateTimeToInstant(offsetDateTime);
@@ -100,7 +138,7 @@ public class UtilitiesTest {
   @Test
   void givenInstantToOffsetDateTimeThenSuccess(){
     Instant instant = Instant.parse("2025-01-09T10:30:00Z");
-    OffsetDateTime expectedOffsetDateTime = OffsetDateTime.of(2025, 1, 9, 10, 30, 0, 0, ZoneOffset.UTC)
+    OffsetDateTime expectedOffsetDateTime = OffsetDateTime.of(2025, Month.JANUARY.getValue(), 9, 10, 30, 0, 0, ZoneOffset.UTC)
       .atZoneSameInstant(Constants.ZONEID)
       .toOffsetDateTime();
 
@@ -116,8 +154,8 @@ public class UtilitiesTest {
 
   @Test
   void givenOffsetDateTimeToLocalDateTimeThenSuccess() {
-    OffsetDateTime offsetDateTime = OffsetDateTime.of(2025, 1, 9, 10, 30, 0, 0, ZoneOffset.UTC);
-    LocalDateTime expectedLocalDateTime = LocalDateTime.of(2025, 1, 9, 10, 30, 0);
+    OffsetDateTime offsetDateTime = OffsetDateTime.of(2025, Month.JANUARY.getValue(), 9, 10, 30, 0, 0, ZoneOffset.UTC);
+    LocalDateTime expectedLocalDateTime = LocalDateTime.of(2025, Month.JANUARY, 9, 10, 30, 0);
 
     LocalDateTime result = Utilities.offsetDateTimeToLocalDateTime(offsetDateTime);
     assertEquals(expectedLocalDateTime, result);
@@ -136,27 +174,6 @@ public class UtilitiesTest {
     String workflowId = Utilities.generateWorkflowId("00000020f51bb4362eee2a4d", Utilities.class);
 
     assertEquals("Utilities-00000020f51bb4362eee2a4d", workflowId);
-  }
-
-  @Test
-  void testGetTraceId(){
-    // Given
-    String expectedResult = "TRACEID";
-    setTraceId(expectedResult);
-
-    // When
-    String result = Utilities.getTraceId();
-
-    // Then
-    Assertions.assertSame(expectedResult, result);
-    clearTraceIdContext();
-  }
-
-  public static void setTraceId(String traceId) {
-    MDC.put("traceId", traceId);
-  }
-  public static void clearTraceIdContext(){
-    MDC.clear();
   }
 
   @Test
