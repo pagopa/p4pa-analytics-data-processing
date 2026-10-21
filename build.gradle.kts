@@ -9,7 +9,6 @@ plugins {
   id("io.spring.dependency-management") version "1.1.7"
   jacoco
   id("org.sonarqube") version "7.4.0.8496"
-  id("com.github.ben-manes.versions") version "0.53.0"
   id("org.openapi.generator") version "7.25.0"
   id("com.gorylenko.gradle-git-properties") version "4.0.1"
   id("com.github.jk1.dependency-license-report") version "3.1.4"
