@@ -4,6 +4,7 @@ import it.gov.pagopa.analytics.process.dto.generated.ErrorFieldDTO;
 import it.gov.pagopa.analytics.process.exception.common.*;
 import it.gov.pagopa.analytics.process.utils.SecurityUtils;
 import jakarta.annotation.Nonnull;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -25,8 +26,10 @@ import java.util.function.Function;
 
 /** It will transcode Http client errors (see ignoredClientErrors for exceptions) using the provided transcoder. */
 @Slf4j
+@Getter
 public class HttpClientErrorJsonBodyHandler<T> extends DefaultResponseErrorHandler {
 
+  private final String applicationName;
   private final JsonMapper jsonMapper;
   private final Class<T> errorDtoClass;
   private final BiFunction<HttpStatusCodeException, T, RuntimeException> errorTranscoder;
@@ -68,6 +71,7 @@ public class HttpClientErrorJsonBodyHandler<T> extends DefaultResponseErrorHandl
   }
 
   public HttpClientErrorJsonBodyHandler(JsonMapper jsonMapper, String applicationName, boolean bodyPrinterWhenError, Class<T> errorDtoClass, BiFunction<HttpStatusCodeException, T, RuntimeException> httpClientExceptionTranscoder) {
+    this.applicationName = applicationName;
     this.jsonMapper = jsonMapper;
     this.errorDtoClass = errorDtoClass;
     this.errorTranscoder = httpClientExceptionTranscoder;
@@ -123,6 +127,7 @@ public class HttpClientErrorJsonBodyHandler<T> extends DefaultResponseErrorHandl
       String code = applicationName + "_" + ((HttpStatus) exception.getStatusCode()).name();
       String category = null;
       String message = exception.getMessage();
+      String body = exception.getResponseBodyAsString();
       List<ErrorFieldDTO> fields = null;
 
       if(errorDTO != null) {
@@ -138,11 +143,11 @@ public class HttpClientErrorJsonBodyHandler<T> extends DefaultResponseErrorHandl
       }
 
       return switch (exception.getStatusCode()) {
-        case HttpStatus.CONFLICT -> new RestInvokeConflictException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message, fields);
-        case HttpStatus.FORBIDDEN -> new RestInvokeForbiddenException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message);
-        case HttpStatus.UNAUTHORIZED -> new RestInvokeNotAuthorizedException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message);
-        case HttpStatus.NOT_FOUND -> new RestInvokeNotFoundException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message);
-        default -> new RestInvokeInvalidValueException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message, fields);
+        case HttpStatus.CONFLICT -> new RestInvokeConflictException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message, fields, body);
+        case HttpStatus.FORBIDDEN -> new RestInvokeForbiddenException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message, body);
+        case HttpStatus.UNAUTHORIZED -> new RestInvokeNotAuthorizedException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message, body);
+        case HttpStatus.NOT_FOUND -> new RestInvokeNotFoundException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message, body);
+        default -> new RestInvokeInvalidValueException(applicationName, (HttpStatus) exception.getStatusCode(), category, code, message, fields, body);
       };
     };
   }
