@@ -27,6 +27,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class WorkflowServiceTest {
@@ -47,7 +50,7 @@ class WorkflowServiceTest {
 
   @BeforeEach
   void init() {
-    workflowService = Mockito.spy(new WorkflowServiceImpl(namespace, workflowClientMock, mapperMock));
+    workflowService = spy(new WorkflowServiceImpl(namespace, workflowClientMock, mapperMock));
   }
 
   @AfterEach
@@ -178,7 +181,7 @@ class WorkflowServiceTest {
     // Given
     String taskQueue = "test-task-queue";
     String workflowId = "test-workflow-id";
-    WorkflowStub expectedStub = Mockito.mock(WorkflowStub.class);
+    WorkflowStub expectedStub = mock(WorkflowStub.class);
     Class<?> workflowClass = Object.class;
 
     when(workflowClientMock.newUntypedWorkflowStub(
@@ -228,7 +231,7 @@ class WorkflowServiceTest {
     AnalyticsDataProcessWF result = workflowService.buildWorkflowStubDelayed(AnalyticsDataProcessWF.class,
       taskQueue,
       workflowId,
-      Duration.between(LocalDateTime.now(), LocalDateTime.now().minusDays(1)));
+      Duration.ofDays(-1));
 
     Assertions.assertSame(wfMock, result);
   }
@@ -322,7 +325,7 @@ class WorkflowServiceTest {
   void whenCancelWorkflowThenOk() {
     // Given
     String workflowId = "WFID";
-    WorkflowStub stubMock = Mockito.mock(WorkflowStub.class);
+    WorkflowStub stubMock = mock(WorkflowStub.class);
 
     when(workflowClientMock.newUntypedWorkflowStub(workflowId))
       .thenReturn(stubMock);
@@ -331,7 +334,7 @@ class WorkflowServiceTest {
     workflowService.cancelWorkflow(workflowId);
 
     // Then
-    Mockito.verify(stubMock).cancel();
+    verify(stubMock).cancel();
   }
 
   @Test
