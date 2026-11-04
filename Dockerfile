@@ -14,7 +14,7 @@ ARG IMAGE="public.ecr.aws/docker/library/eclipse-temurin"
 # It could be possible to return to Alpine once resolved: https://github.com/dbt-labs/dbt/issues/15607
 ARG IMAGE_VERSION="21-jdk-noble"
 ARG IMAGE_SHA="114cabb73033ca4ce7ceec3deb62396bc1b716282bae051ed3c1d82e38fcab2d"
-ARG APPINSIGHTS_VERSION="3.7.9"
+ARG APPINSIGHTS_VERSION="3.7.10"
 
 # 🌍 Timezone Configuration
 ARG TZ="Europe/Rome"
