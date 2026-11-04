@@ -4,8 +4,16 @@
 # 🎯 Version Management
 #
 ARG IMAGE="public.ecr.aws/docker/library/eclipse-temurin"
-ARG IMAGE_VERSION="21-alpine-3.24"
-ARG IMAGE_SHA="6ea5548706b60ac0a602eaf48af74792cbab012d90e811ca8db6184b16b5c3d6"
+
+#The image uses Temurin Java 21 on Ubuntu 24.04 (Noble), with Python 3.12
+#installed through APT. The glibc-based distribution supports the native Linux
+#wheels required by dbt's experimental parser, unlike Alpine/musl.
+#dbt is installed in `/app/.venv`, which is also included in `PATH` so Java
+#subprocesses can invoke it without activating the virtual environment.
+#Update both `IMAGE_VERSION` and `IMAGE_SHA` when updating the base image.
+# It could be possible to return to Alpine once resolved: https://github.com/dbt-labs/dbt/issues/15607
+ARG IMAGE_VERSION="21-jdk-noble"
+ARG IMAGE_SHA="114cabb73033ca4ce7ceec3deb62396bc1b716282bae051ed3c1d82e38fcab2d"
 ARG APPINSIGHTS_VERSION="3.7.9"
 
 # 🌍 Timezone Configuration
@@ -31,16 +39,17 @@ ARG APP_USER
 ARG APP_GROUP
 
 # Install base packages
-RUN apk add --no-cache \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     wget \
     unzip \
     bash \
-    shadow \
-    git
+    git && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create user
-RUN groupadd --system --gid 1000 ${APP_GROUP} && \
-    useradd --system --gid ${APP_GROUP} --uid 1000 --shell /bin/bash --create-home ${APP_USER}
+# Reuse Noble's default UID/GID 1000 for the build user.
+RUN groupmod --new-name ${APP_GROUP} ubuntu && \
+    usermod --login ${APP_USER} --home /home/${APP_USER} --move-home ubuntu
 
 #
 # 📦 Gradle Setup Stage
@@ -112,28 +121,29 @@ WORKDIR ${APP_HOME}
 
 # Set timezone environment variable
 ENV TZ=${TZ}
+ENV PATH="${APP_HOME}/.venv/bin:${PATH}"
 
 # 🛡️ Security Setup and Timezone
-RUN apk upgrade --no-cache && \
-    apk add --no-cache \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ca-certificates \
         tini \
         curl \
         python3 \
+        python3-venv \
         # Configure timezone + ENV=TZ \
         tzdata \
-        git  && \
+        git && \
+    rm -rf /var/lib/apt/lists/* && \
     # Create user and group \
-    addgroup -S ${APP_GROUP} && \
-    adduser -S ${APP_USER} -G ${APP_GROUP} && \
+    groupadd --system ${APP_GROUP} && \
+    useradd --system --gid ${APP_GROUP} --create-home ${APP_USER} && \
     # Install dbt-core \
     python3 -m venv .venv && \
-    source .venv/bin/activate && \
-    python -m ensurepip --upgrade && \
-    python -m pip install "dbt-core==1.11.14" "dbt-postgres==1.11.0" && \
-    dbt --version && \
-    echo source .venv/bin/activate >> /etc/profile && \
-    echo PATH="$PATH" >> /etc/profile && \
-    chmod +x /etc/profile
+    python -m pip install --no-cache-dir "dbt-core==1.12.6" "dbt-postgres==1.11.0" && \
+    python -m pip check && \
+    dbt --version
 
 ADD --chmod=644 https://github.com/microsoft/ApplicationInsights-Java/releases/download/${APPINSIGHTS_VERSION}/applicationinsights-agent-${APPINSIGHTS_VERSION}.jar ${APP_HOME}/applicationinsights-agent.jar
 
@@ -158,5 +168,5 @@ EXPOSE 8080
 USER ${APP_USER}
 
 # 🎬 Startup Configuration
-ENTRYPOINT ["/sbin/tini", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["java", "-jar", "/app/app.jar"]
