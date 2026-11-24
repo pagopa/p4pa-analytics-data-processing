@@ -22,6 +22,8 @@ WITH source as (
   {% if is_incremental() %}
     where auth.processed_time >= (select coalesce(max(processed_time), '1900-01-01') from {{ this }} )
     -- skip keys already loaded: the watermark can re-read rows (e.g. DST change on raw.processed_time)
+    -- each event has a unique key (raw.auth_seq), so this filter only applies when
+    -- an already processed event is re-read because of a DST change (shifted processed_time)
     and not exists (
       select 1
       from {{ this }} t
