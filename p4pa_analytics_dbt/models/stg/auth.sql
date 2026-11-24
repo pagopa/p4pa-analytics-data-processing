@@ -1,31 +1,10 @@
 {{ config(
     materialized= "incremental",
-    unique_key="auth_pk",
-    incremental_strategy="merge",
+    incremental_strategy="append",
   )
 }}
 
-WITH base as (
-  select
-    auth_pk,
-    auth_payload,
-    processed_time
-  from raw.auth
-
-  {% if is_incremental() %}
-    where processed_time >= (select coalesce(max(processed_time), '1900-01-01') from {{ this }} )
-  {% endif %}
-),
-
--- keep only the most recent row on a same key within the batch
-ranked as (
-  select
-    b.*,
-    row_number() over (partition by auth_pk order by processed_time desc) as rn
-  from base as b
-),
-
-source as (
+WITH source as (
   select
     {{ dbt_utils.generate_surrogate_key(['auth.auth_pk']) }} as auth_pk,
     auth.auth_payload as auth_payload,
@@ -38,8 +17,17 @@ source as (
     -- technical fields
     current_timestamp as target_processed_time
 
-  from ranked auth
-  where auth.rn = 1
+  from raw.auth auth
+
+  {% if is_incremental() %}
+    where auth.processed_time >= (select coalesce(max(processed_time), '1900-01-01') from {{ this }} )
+    -- skip keys already loaded: the watermark can re-read rows (e.g. DST change on raw.processed_time)
+    and not exists (
+      select 1
+      from {{ this }} t
+      where t.auth_pk = {{ dbt_utils.generate_surrogate_key(['auth.auth_pk']) }}
+    )
+  {% endif %}
 ),
 
 normalized_source as (
