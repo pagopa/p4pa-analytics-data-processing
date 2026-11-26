@@ -4,11 +4,17 @@
 # 🎯 Version Management
 #
 ARG IMAGE="public.ecr.aws/docker/library/eclipse-temurin"
-ARG IMAGE_VERSION="21-alpine-3.23"
-ARG IMAGE_SHA="bcc6da0b0efc6fb0e445173784dddb45d5f70afa8a9128430a63f79ef0154601"
-ARG GRADLE_VERSION="8.14.3"
-ARG GRADLE_DOWNLOAD_SHA256="bd71102213493060956ec229d946beee57158dbd89d0e62b91bca0fa2c5f3531"
-ARG APPINSIGHTS_VERSION="3.7.9"
+
+#The image uses Temurin Java 21 on Ubuntu 24.04 (Noble), with Python 3.12
+#installed through APT. The glibc-based distribution supports the native Linux
+#wheels required by dbt's experimental parser, unlike Alpine/musl.
+#dbt is installed in `/app/.venv`, which is also included in `PATH` so Java
+#subprocesses can invoke it without activating the virtual environment.
+#Update both `IMAGE_VERSION` and `IMAGE_SHA` when updating the base image.
+# It could be possible to return to Alpine once resolved: https://github.com/dbt-labs/dbt/issues/15607
+ARG IMAGE_VERSION="21-jdk-noble"
+ARG IMAGE_SHA="114cabb73033ca4ce7ceec3deb62396bc1b716282bae051ed3c1d82e38fcab2d"
+ARG APPINSIGHTS_VERSION="3.7.10"
 
 # 🌍 Timezone Configuration
 ARG TZ="Europe/Rome"
@@ -24,70 +30,52 @@ ARG GRADLE_OPTS="-Dorg.gradle.daemon=false \
 ARG APP_USER="appuser"
 ARG APP_GROUP="appgroup"
 ARG APP_HOME="/app"
-ARG GRADLE_HOME="/opt/gradle"
 
 #
 # 📥 Base Setup Stage
 #
-FROM ${IMAGE}:${IMAGE_VERSION}@sha256:${IMAGE_SHA} AS base
+FROM ${IMAGE}@sha256:${IMAGE_SHA} AS base
 ARG APP_USER
 ARG APP_GROUP
 
 # Install base packages
-RUN apk add --no-cache \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     wget \
     unzip \
     bash \
-    shadow \
-    git
+    git && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create Gradle user
-RUN groupadd --system --gid 1000 ${APP_GROUP} && \
-    useradd --system --gid ${APP_GROUP} --uid 1000 --shell /bin/bash --create-home ${APP_USER}
+# Reuse Noble's default UID/GID 1000 for the build user.
+RUN groupmod --new-name ${APP_GROUP} ubuntu && \
+    usermod --login ${APP_USER} --home /home/${APP_USER} --move-home ubuntu
 
 #
 # 📦 Gradle Setup Stage
 #
 FROM base AS gradle-setup
-ARG GRADLE_VERSION
-ARG GRADLE_DOWNLOAD_SHA256
-ARG GRADLE_HOME
 ARG GRADLE_OPTS
 ARG APP_USER
 ARG APP_GROUP
 
 # Set environment variables for Gradle
 ENV GRADLE_OPTS="${GRADLE_OPTS}"
-ENV GRADLE_HOME="${GRADLE_HOME}"
-ENV PATH="${GRADLE_HOME}/bin:${PATH}"
 
-WORKDIR /tmp
+WORKDIR /build
+
+COPY --chown=${APP_USER}:${APP_GROUP} gradle gradle/
+COPY --chown=${APP_USER}:${APP_GROUP} gradlew gradlew
 
 # Download and verify Gradle with progress bar
-RUN echo "Downloading Gradle ${GRADLE_VERSION}..." && \
-    wget --progress=bar:force --output-document=gradle.zip \
-        "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" && \
-    echo "Verifying download..." && \
-    echo "${GRADLE_DOWNLOAD_SHA256}  gradle.zip" | sha256sum -c - && \
-    echo "Installing Gradle..." && \
-    unzip -q gradle.zip && \
-    mv "gradle-${GRADLE_VERSION}" "${GRADLE_HOME}" && \
-    ln -s "${GRADLE_HOME}/bin/gradle" /usr/bin/gradle && \
-    rm gradle.zip && \
-    # Setup Gradle user directories \
-    mkdir -p /home/${APP_USER}/.gradle && \
-    chown --recursive ${APP_USER}:${APP_GROUP} /home/${APP_USER} && \
-    # Verify installation \
-    echo "Verifying Gradle installation..." && \
-    gradle --version
-
-# Create Gradle volume
-VOLUME /home/${APP_USER}/.gradle
+RUN ./gradlew --version
 
 #
 # 📚 Dependencies Stage
 #
 FROM gradle-setup AS dependencies
+ARG APP_USER
+ARG APP_GROUP
 
 WORKDIR /build
 
@@ -104,23 +92,25 @@ RUN mkdir -p src/main/java && \
 
 USER ${APP_USER}
 
-RUN gradle dependenciesBuild dependencies --no-daemon
+RUN ./gradlew dependenciesBuild dependencies --no-daemon >/dev/null
 
 #
 # 🏗️ Build Stage
 #
 FROM dependencies AS build
+ARG APP_USER
+ARG APP_GROUP
 
 # Copy source code
 COPY --chown=${APP_USER}:${APP_GROUP} src src/
 
 # Build application
-RUN gradle bootJar --no-daemon
+RUN ./gradlew bootJar --no-daemon
 
 #
 # 🚀 Runtime Stage
 #
-FROM ${IMAGE}:${IMAGE_VERSION}@sha256:${IMAGE_SHA} AS runtime
+FROM ${IMAGE}@sha256:${IMAGE_SHA} AS runtime-base
 ARG APP_USER
 ARG APP_GROUP
 ARG APP_HOME
@@ -131,28 +121,36 @@ WORKDIR ${APP_HOME}
 
 # Set timezone environment variable
 ENV TZ=${TZ}
+ENV PATH="${APP_HOME}/.venv/bin:${PATH}"
 
 # 🛡️ Security Setup and Timezone
-RUN apk upgrade --no-cache && \
-    apk add --no-cache \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ca-certificates \
         tini \
         curl \
         python3 \
+        python3-venv \
         # Configure timezone + ENV=TZ \
         tzdata \
-        git  && \
+        git && \
+    rm -rf /var/lib/apt/lists/* && \
     # Create user and group \
-    addgroup -S ${APP_GROUP} && \
-    adduser -S ${APP_USER} -G ${APP_GROUP} && \
+    groupadd --system ${APP_GROUP} && \
+    useradd --system --gid ${APP_GROUP} --create-home ${APP_USER} && \
     # Install dbt-core \
     python3 -m venv .venv && \
-    source .venv/bin/activate && \
-    python -m ensurepip --upgrade && \
-    python -m pip install "dbt-core==1.11.14" "dbt-postgres==1.11.0" && \
-    dbt --version && \
-    echo source .venv/bin/activate >> /etc/profile && \
-    echo PATH="$PATH" >> /etc/profile && \
-    chmod +x /etc/profile
+    python -m pip install --no-cache-dir "dbt-core==1.12.6" "dbt-postgres==1.11.0" && \
+    python -m pip check && \
+    dbt --version
+
+ADD --chmod=644 https://github.com/microsoft/ApplicationInsights-Java/releases/download/${APPINSIGHTS_VERSION}/applicationinsights-agent-${APPINSIGHTS_VERSION}.jar ${APP_HOME}/applicationinsights-agent.jar
+
+FROM runtime-base AS runtime
+ARG APP_USER
+ARG APP_GROUP
+ARG APP_HOME
 
 # Copy dbt project and scripts
 COPY --chown=${APP_USER}:${APP_GROUP} p4pa_analytics_dbt dbt/
@@ -161,7 +159,6 @@ RUN chmod +x /app/script/*
 
 # 📦 Copy Artifacts
 COPY --from=build /build/build/libs/*.jar ${APP_HOME}/app.jar
-ADD --chmod=644 https://github.com/microsoft/ApplicationInsights-Java/releases/download/${APPINSIGHTS_VERSION}/applicationinsights-agent-${APPINSIGHTS_VERSION}.jar ${APP_HOME}/applicationinsights-agent.jar
 
 # 📝 Set Permissions
 RUN chown -R ${APP_USER}:${APP_GROUP} ${APP_HOME}
@@ -171,5 +168,5 @@ EXPOSE 8080
 USER ${APP_USER}
 
 # 🎬 Startup Configuration
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["/bin/sh", "-l", "-c", "java -jar /app/app.jar"]
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["java", "-jar", "/app/app.jar"]

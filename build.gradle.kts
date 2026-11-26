@@ -5,14 +5,13 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
   java
-  id("org.springframework.boot") version "4.1.1"
+  id("org.springframework.boot") version "4.1.2"
   id("io.spring.dependency-management") version "1.1.7"
   jacoco
-  id("org.sonarqube") version "7.4.0.8496"
-  id("com.github.ben-manes.versions") version "0.53.0"
-  id("org.openapi.generator") version "7.25.0"
+  id("org.sonarqube") version "7.5.0.8588"
+  id("org.openapi.generator") version "7.27.0"
   id("com.gorylenko.gradle-git-properties") version "4.0.1"
-  id("com.github.jk1.dependency-license-report") version "3.1.4"
+  id("com.github.jk1.dependency-license-report") version "3.1.5"
 }
 
 group = "it.gov.pagopa.payhub"
@@ -32,10 +31,14 @@ configurations {
   compileClasspath {
     resolutionStrategy.activateDependencyLocking()
   }
+  runtimeClasspath {
+    resolutionStrategy.activateDependencyLocking()
+  }
 }
 
 licenseReport {
-  renderers = arrayOf(XmlReportRenderer("third-party-libs.xml", "Back-End Libraries"))
+  renderers =
+    arrayOf(XmlReportRenderer("third-party-libs.xml", "Back-End Libraries"))
   outputDir = "$projectDir/dependency-licenses"
   filters = arrayOf(SpdxLicenseBundleNormalizer())
 }
@@ -47,27 +50,27 @@ repositories {
   mavenCentral()
 }
 
-val springDocOpenApiVersion = "3.1.1"
-val openApiToolsVersion = "0.2.11"
-val micrometerVersion = "1.7.1"
+val springDocOpenApiVersion = "3.2.0"
+val openApiToolsVersion = "0.2.13"
+val micrometerOtelBridgeVersion = "1.7.2"
+val micrometerPrometheusVersion = "1.17.2"
 val bouncycastleVersion = "1.86"
-val httpClientVersion = "5.6.4"
+val httpClientVersion = "5.6.5"
 val httpCoreVersion = "5.4.4"
 val kafkaAppender = "0.2.0-RC2"
-val lz4JavaVersion = "1.12.0"
-val commonsLang3Version = "3.20.0"
-val temporalVersion = "1.38.0"
-val protobufJavaVersion = "4.36.0"
-val grpcBomVersion = "1.83.1"
-val guavaVersion = "33.7.0-jre"
-val otelVersion = "1.65.0"
+val lz4JavaVersion = "1.12.1"
+val commonsLang3Version = "3.21.0"
+val temporalVersion = "1.40.0"
+val protobufJavaVersion = "4.36.2"
+val grpcBomVersion = "1.85.1"
+val guavaVersion = "33.8.0-jre"
+val otelVersion = "1.67.0"
 val mapStructVersion = "1.6.3"
 val podamVersion = "8.0.2.RELEASE"
 
 // CVE Security dependencies
-val tomcatEmbedCoreVersion = "11.0.26"
 val jackson2DatabindVersion = "2.22.3"
-val jackson3DatabindVersion = "3.1.7"
+val snappyJavaVersion = "1.1.10.9"
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webmvc")
@@ -81,17 +84,18 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocOpenApiVersion") {
     exclude(group = "org.apache.commons", module = "commons-lang3")
   }
-  implementation ("org.apache.commons:commons-lang3:$commonsLang3Version")
-  implementation("io.micrometer:micrometer-tracing-bridge-otel:$micrometerVersion")
-  implementation("io.micrometer:micrometer-registry-prometheus")
+  implementation("org.apache.commons:commons-lang3:$commonsLang3Version")
+  implementation("io.micrometer:micrometer-tracing-bridge-otel:$micrometerOtelBridgeVersion")
+  implementation("io.micrometer:micrometer-registry-prometheus:$micrometerPrometheusVersion")
   implementation("org.openapitools:jackson-databind-nullable:$openApiToolsVersion")
-  implementation ("org.mapstruct:mapstruct:$mapStructVersion")
-  implementation ("org.bouncycastle:bcprov-jdk18on:$bouncycastleVersion")
+  implementation("org.mapstruct:mapstruct:$mapStructVersion")
+  implementation("org.bouncycastle:bcprov-jdk18on:$bouncycastleVersion")
   implementation("org.apache.httpcomponents.client5:httpclient5:$httpClientVersion")
   implementation("org.apache.httpcomponents.core5:httpcore5-h2:$httpCoreVersion")
   implementation("org.apache.httpcomponents.core5:httpcore5:$httpCoreVersion")
   implementation("com.github.danielwegener:logback-kafka-appender:$kafkaAppender") {
     exclude(group = "org.lz4", module = "lz4-java")
+      exclude(group = "org.xerial.snappy", module = "snappy-java")
   }
   implementation("at.yawk.lz4:lz4-java:$lz4JavaVersion")
   // Temporal
@@ -108,9 +112,8 @@ dependencies {
   implementation("io.opentelemetry:opentelemetry-opentracing-shim:$otelVersion")
 
   // CVE Security dependencies
-  implementation("org.apache.tomcat.embed:tomcat-embed-core:$tomcatEmbedCoreVersion")
-    implementation("com.fasterxml.jackson.core:jackson-databind:$jackson2DatabindVersion")
-    implementation("tools.jackson.core:jackson-databind:$jackson3DatabindVersion")
+  implementation("com.fasterxml.jackson.core:jackson-databind:$jackson2DatabindVersion")
+  implementation("org.xerial.snappy:snappy-java:$snappyJavaVersion")
 
   compileOnly("org.projectlombok:lombok")
   annotationProcessor("org.projectlombok:lombok")
@@ -123,7 +126,7 @@ dependencies {
   testImplementation("org.springframework.boot:spring-boot-starter-security-test")
   testImplementation("org.mockito:mockito-core")
   testImplementation("org.projectlombok:lombok")
-  testImplementation ("uk.co.jemos.podam:podam:$podamVersion")
+  testImplementation("uk.co.jemos.podam:podam:$podamVersion")
 }
 
 tasks.withType<Test> {
@@ -137,10 +140,10 @@ dependencies {
 }
 tasks {
   jar {
-      from("${rootProject.projectDir}") {
-          include("LICENSE.md")
-          into("META-INF")
-      }
+    from("${rootProject.projectDir}") {
+      include("LICENSE.md")
+      into("META-INF")
+    }
   }
   test {
     jvmArgs("-javaagent:${mockitoAgent.asPath}")
@@ -160,6 +163,25 @@ val projectInfo = mapOf(
   "artifactId" to project.name,
   "version" to project.version
 )
+
+configure<SourceSetContainer> {
+  named("main") {
+    java.srcDir("$projectDir/build/generated/src/main/java")
+  }
+}
+
+springBoot {
+  buildInfo()
+  mainClass.value("it.gov.pagopa.analytics.process.AnalyticsDataProcessingApplication")
+}
+
+tasks.named<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>("dependencyUpdates") {
+  revision = "release"
+  outputFormatter = "json"
+  checkForGradleUpdate = false
+  checkEmbeddedKotlin = false
+  rejectPreReleases = true
+}
 
 tasks {
   val processResources by getting(ProcessResources::class) {
@@ -183,38 +205,31 @@ tasks.register("dependenciesBuild") {
   )
 }
 
-configure<SourceSetContainer> {
-  named("main") {
-    java.srcDir("$projectDir/build/generated/src/main/java")
-  }
-}
-
-springBoot {
-  buildInfo()
-  mainClass.value("it.gov.pagopa.analytics.process.AnalyticsDataProcessingApplication")
-}
-
 openApiGenerate {
   generatorName.set("spring")
   inputSpec.set("$rootDir/openapi/p4pa-analytics-data-processing.openapi.yaml")
   outputDir.set("$projectDir/build/generated")
   apiPackage.set("it.gov.pagopa.analytics.process.controller.generated")
   modelPackage.set("it.gov.pagopa.analytics.process.dto.generated")
-  typeMappings.set(mapOf(
-    "ScheduleEnum" to "it.gov.pagopa.analytics.process.enums.ScheduleEnum",
-    "WorkflowExecutionStatus" to "io.temporal.api.enums.v1.WorkflowExecutionStatus"
-  ))
-  configOptions.set(mapOf(
-    "dateLibrary" to "java8",
-    "requestMappingMode" to "api_interface",
-    "useSpringBoot4" to "true",
-    "useJackson3" to "true",
-    "interfaceOnly" to "true",
-    "useTags" to "true",
-    "useBeanValidation" to "true",
-    "generateConstructorWithAllArgs" to "true",
-    "generatedConstructorWithRequiredArgs" to "true",
-    "enumPropertyNaming" to "original",
-    "additionalModelTypeAnnotations" to "@lombok.experimental.SuperBuilder(toBuilder = true)"
-  ))
+  typeMappings.set(
+    mapOf(
+      "ScheduleEnum" to "it.gov.pagopa.analytics.process.enums.ScheduleEnum",
+      "WorkflowExecutionStatus" to "io.temporal.api.enums.v1.WorkflowExecutionStatus"
+    )
+  )
+  configOptions.set(
+    mapOf(
+      "dateLibrary" to "java8",
+      "requestMappingMode" to "api_interface",
+      "useSpringBoot4" to "true",
+      "useJackson3" to "true",
+      "interfaceOnly" to "true",
+      "useTags" to "true",
+      "useBeanValidation" to "true",
+      "generateConstructorWithAllArgs" to "true",
+      "generatedConstructorWithRequiredArgs" to "true",
+      "enumPropertyNaming" to "original",
+      "additionalModelTypeAnnotations" to "@lombok.experimental.SuperBuilder(toBuilder = true)"
+    )
+  )
 }
