@@ -25,6 +25,14 @@ with source as (
 
     {% if is_incremental() %}
         where ex.processed_time >= (select coalesce(max(processed_time), '1900-01-01') from {{ this }} )
+        -- skip keys already loaded: the watermark can re-read rows (e.g. DST change on raw.processed_time)
+        -- each event has a unique key, so this filter only applies when
+        -- an already processed event is re-read because of a DST change (shifted processed_time)
+        and not exists (
+          select 1
+          from {{ this }} t
+          where t.export_file_pk = {{ dbt_utils.generate_surrogate_key(['ex.export_file_pk']) }}
+        )
     {% endif %}
 )
 
